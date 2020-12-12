@@ -8,17 +8,20 @@ import {
   Keyboard,
 } from "react-native";
 import { Button } from "react-native-ios-kit";
-import { IconButton } from "react-native-paper";
+import { auth } from '../firebase';
 
 function LoginScreen({ navigation }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const DismissKeyboard = ({ children }) => (
-    <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
-      {children}
-    </TouchableWithoutFeedback>
-  );
+  const signInWithEmailAndPasswordHandler = (event) => {
+    event.preventDefault();
+    auth.signInWithEmailAndPassword(email, password).then(
+      console.log("Login Success!")
+    ).catch(err => {
+      console.log("Login error", err);
+    });
+  };
 
   return (
     <View style={styles.container}>
@@ -39,7 +42,7 @@ function LoginScreen({ navigation }) {
         style={styles.formInput}
         onChangeText={(usePassword) => setPassword(usePassword)}
       />
-      <Button inline inverted style={styles.button}>
+      <Button inline inverted style={styles.button} onPress={(event) => signInWithEmailAndPasswordHandler(event)}>
         Log In
       </Button>
       <Button
