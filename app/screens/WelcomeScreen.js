@@ -6,36 +6,46 @@ import {
   SafeAreaView,
   Image,
   TextInput,
+  TouchableWithoutFeedback,
+  Keyboard,
 } from "react-native";
 import { Button } from "react-native-ios-kit";
 
 function WelcomeScreen(props) {
+  const DismissKeyboard = ({ children }) => (
+    <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
+      {children}
+    </TouchableWithoutFeedback>
+  );
+
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.logoContainer}>
-        <Text style={styles.title}>MusicSessions</Text>
-        <Image source={require("../assets/vinyl.png")} />
-      </View>
-      <View style={styles.formContainer}>
-        <Text style={styles.formLabel}>
-          Join or Create a Music Listening Group!
-        </Text>
-        <View style={styles.inputContainer}>
-          <TextInput
-            style={styles.inputStyle}
-            placeholder="Enter Group Code"
-            placeholderTextColor="#7C7B7B"
-            maxLength={6}
-          />
+    <DismissKeyboard>
+      <SafeAreaView style={styles.container}>
+        <View style={styles.logoContainer}>
+          <Text style={styles.title}>MusicSessions</Text>
+          <Image style={styles.logo} source={require("../assets/vinyl.png")} />
         </View>
-        <View style={styles.buttonContainer}>
-          <Text style={styles.formLabel}>Or</Text>
-          <Button inline inverted style={styles.button}>
-            Create New Group
-          </Button>
+        <View style={styles.formContainer}>
+          <Text style={styles.formLabel}>
+            Join or Create a Music Listening Group!
+          </Text>
+          <View style={styles.inputContainer}>
+            <TextInput
+              style={styles.inputStyle}
+              placeholder="Enter Group Code"
+              placeholderTextColor="#7C7B7B"
+              maxLength={6}
+            />
+          </View>
+          <View style={styles.buttonContainer}>
+            <Text style={styles.formLabel}>Or</Text>
+            <Button inline inverted style={styles.button}>
+              Create New Group
+            </Button>
+          </View>
         </View>
-      </View>
-    </SafeAreaView>
+      </SafeAreaView>
+    </DismissKeyboard>
   );
 }
 
@@ -69,6 +79,9 @@ const styles = StyleSheet.create({
     top: 40,
     alignItems: "center",
   },
+  logo: {
+    top: 30,
+  },
   logoContainer: {
     flex: 1,
     alignItems: "center",
@@ -78,7 +91,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "flex-start",
     alignItems: "center",
-    top: 40,
   },
   formLabel: {
     color: "white",
