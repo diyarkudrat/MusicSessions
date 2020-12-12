@@ -50,13 +50,6 @@ function LoginScreen({ navigation }) {
       >
         New User? Join here
       </Button>
-      <IconButton
-        icon="keyboard-backspace"
-        size={30}
-        style={styles.navButton}
-        color="#20E4B5"
-        onPress={() => navigation.goBack()}
-      />
     </View>
   );
 }
