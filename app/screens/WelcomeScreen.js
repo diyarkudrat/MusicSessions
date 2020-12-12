@@ -11,7 +11,7 @@ import {
 } from "react-native";
 import { Button } from "react-native-ios-kit";
 
-function WelcomeScreen(props) {
+function WelcomeScreen({ navigation }) {
   const DismissKeyboard = ({ children }) => (
     <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
       {children}
@@ -39,7 +39,12 @@ function WelcomeScreen(props) {
           </View>
           <View style={styles.buttonContainer}>
             <Text style={styles.formLabel}>Or</Text>
-            <Button inline inverted style={styles.button}>
+            <Button
+              inline
+              inverted
+              style={styles.button}
+              onPress={() => navigation.navigate("Login")}
+            >
               Create New Group
             </Button>
           </View>
