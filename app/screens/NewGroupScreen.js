@@ -8,7 +8,6 @@ import {
   StyleSheet,
 } from "react-native";
 import { Button } from "react-native-ios-kit";
-import { KeyboardAwareView } from "react-native-keyboard-aware-view";
 
 const NewGroupForm = () => {
   const DismissKeyboard = ({ children }) => (
@@ -49,6 +48,15 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     height: 50,
   },
+  button: {
+    backgroundColor: "#20E4B5",
+    height: 50,
+    width: 300,
+    justifyContent: "center",
+    alignItems: "center",
+    top: 30,
+    borderRadius: 30,
+  },
   formContainer: {
     bottom: 60,
     alignItems: "center",
@@ -65,16 +73,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     paddingHorizontal: 10,
     marginTop: 20,
-  },
-  button: {
-    backgroundColor: "#20E4B5",
-    height: 50,
-    width: 300,
-    justifyContent: "center",
-    alignItems: "center",
-    top: 30,
-    borderRadius: 30,
-    fontWeight: "bold",
   },
 });
 
