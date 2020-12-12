@@ -21,45 +21,43 @@ function LoginScreen({ navigation }) {
   );
 
   return (
-    <DismissKeyboard>
-      <View style={styles.container}>
-        <Text style={styles.title}>Log In</Text>
-        <TextInput
-          placeholder="Enter Email"
-          labelName="Email"
-          style={styles.formInput}
-          value={email}
-          autoCapitalize="none"
-          onChangeText={(userEmail) => setEmail(userEmail)}
-        />
-        <TextInput
-          placeholder="Enter Password"
-          labelName="Password"
-          secureTextEntry={true}
-          value={password}
-          style={styles.formInput}
-          onChangeText={(usePassword) => setPassword(usePassword)}
-        />
-        <Button inline inverted style={styles.button}>
-          Log In
-        </Button>
-        <Button
-          inline
-          inverted
-          style={styles.button}
-          onPress={() => navigation.navigate("Signup")}
-        >
-          New User? Join here
-        </Button>
-        <IconButton
-          icon="keyboard-backspace"
-          size={30}
-          style={styles.navButton}
-          color="#20E4B5"
-          onPress={() => navigation.goBack()}
-        />
-      </View>
-    </DismissKeyboard>
+    <View style={styles.container}>
+      <Text style={styles.title}>Log In</Text>
+      <TextInput
+        placeholder="Enter Email"
+        labelName="Email"
+        style={styles.formInput}
+        value={email}
+        autoCapitalize="none"
+        onChangeText={(userEmail) => setEmail(userEmail)}
+      />
+      <TextInput
+        placeholder="Enter Password"
+        labelName="Password"
+        secureTextEntry={true}
+        value={password}
+        style={styles.formInput}
+        onChangeText={(usePassword) => setPassword(usePassword)}
+      />
+      <Button inline inverted style={styles.button}>
+        Log In
+      </Button>
+      <Button
+        inline
+        inverted
+        style={styles.button}
+        onPress={() => navigation.navigate("Signup")}
+      >
+        New User? Join here
+      </Button>
+      <IconButton
+        icon="keyboard-backspace"
+        size={30}
+        style={styles.navButton}
+        color="#20E4B5"
+        onPress={() => navigation.goBack()}
+      />
+    </View>
   );
 }
 

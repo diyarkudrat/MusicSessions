@@ -12,45 +12,41 @@ import {
 import { Button } from "react-native-ios-kit";
 
 function WelcomeScreen({ navigation }) {
-  const DismissKeyboard = ({ children }) => (
-    <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
-      {children}
-    </TouchableWithoutFeedback>
-  );
+  const [groupCode, setGroupCode] = useState("");
 
   return (
-    <DismissKeyboard>
-      <SafeAreaView style={styles.container}>
-        <View style={styles.logoContainer}>
-          <Text style={styles.title}>MusicSessions</Text>
-          <Image style={styles.logo} source={require("../assets/vinyl.png")} />
+    <SafeAreaView style={styles.container}>
+      <View style={styles.logoContainer}>
+        <Text style={styles.title}>MusicSessions</Text>
+        <Image style={styles.logo} source={require("../assets/vinyl.png")} />
+      </View>
+      <View style={styles.formContainer}>
+        <Text style={styles.formLabel}>
+          Join or Create a Music Listening Group!
+        </Text>
+        <View style={styles.inputContainer}>
+          <TextInput
+            style={styles.inputStyle}
+            placeholder="Enter Group Code"
+            placeholderTextColor="#7C7B7B"
+            maxLength={6}
+            value={groupCode}
+            onChangeText={(text) => setGroupCode(text)}
+          />
         </View>
-        <View style={styles.formContainer}>
-          <Text style={styles.formLabel}>
-            Join or Create a Music Listening Group!
-          </Text>
-          <View style={styles.inputContainer}>
-            <TextInput
-              style={styles.inputStyle}
-              placeholder="Enter Group Code"
-              placeholderTextColor="#7C7B7B"
-              maxLength={6}
-            />
-          </View>
-          <View style={styles.buttonContainer}>
-            <Text style={styles.formLabel}>Or</Text>
-            <Button
-              inline
-              inverted
-              style={styles.button}
-              onPress={() => navigation.navigate("Login")}
-            >
-              Create New Group
-            </Button>
-          </View>
+        <View style={styles.buttonContainer}>
+          <Text style={styles.formLabel}>Or</Text>
+          <Button
+            inline
+            inverted
+            style={styles.button}
+            onPress={() => navigation.navigate("Login")}
+          >
+            Create New Group
+          </Button>
         </View>
-      </SafeAreaView>
-    </DismissKeyboard>
+      </View>
+    </SafeAreaView>
   );
 }
 
