@@ -9,7 +9,7 @@ import {
 } from "react-native";
 import { Button } from "react-native-ios-kit";
 
-function LoginScreen(props) {
+function LoginScreen({ navigation }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -42,7 +42,12 @@ function LoginScreen(props) {
         <Button inline inverted style={styles.button}>
           Log In
         </Button>
-        <Button inline inverted style={styles.button}>
+        <Button
+          inline
+          inverted
+          style={styles.button}
+          onPress={() => navigation.navigate("Signup")}
+        >
           New User? Join here
         </Button>
       </View>

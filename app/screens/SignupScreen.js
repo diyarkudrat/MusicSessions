@@ -10,7 +10,7 @@ import {
 import { Button } from "react-native-ios-kit";
 import { IconButton } from "react-native-paper";
 
-function SignupScreen(props) {
+function SignupScreen({ navigation }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -48,7 +48,7 @@ function SignupScreen(props) {
           size={30}
           style={styles.navButton}
           color="#20E4B5"
-          onPresss={() => navigation.navigate("Login")}
+          onPress={() => navigation.goBack()}
         />
       </View>
     </DismissKeyboard>
