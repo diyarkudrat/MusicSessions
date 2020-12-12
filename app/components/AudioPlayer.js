@@ -85,7 +85,7 @@ function AudioPlayer(props) {
       <View style={styles.container}>
         <Image
           style={styles.albumCover}
-          source={require("../assets/icon.png")}
+          source={{ uri: props.audioPlaylist[currentIndex].imgSource }}
         />
         <View style={styles.controls}>
           <TouchableOpacity

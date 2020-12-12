@@ -16,7 +16,7 @@ const audioPlaylist = [
     uri:
       "https://ia600204.us.archive.org/11/items/hamlet_0911_librivox/hamlet_act2_shakespeare.mp3",
     imgSource:
-      "http://www.archive.org/download/LibrivoxCdCoverArt8/hamlet_1104.jpg",
+      "http://www.pngmart.com/files/7/Red-Smoke-Transparent-Images-PNG.png",
   },
   {
     title: "Audio #3",
