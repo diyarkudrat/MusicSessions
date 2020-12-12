@@ -8,6 +8,7 @@ import {
   StyleSheet,
 } from "react-native";
 import { Button } from "react-native-ios-kit";
+import { KeyboardAwareView } from "react-native-keyboard-aware-view";
 
 const NewGroupForm = () => {
   const DismissKeyboard = ({ children }) => (
@@ -19,17 +20,22 @@ const NewGroupForm = () => {
   return (
     <DismissKeyboard>
       <View style={styles.container}>
-        <Text style={styles.formLabel}>Create a New Group</Text>
-        <View>
-          <TextInput
-            placeholder="Enter First and Last Name"
-            style={styles.inputStyle}
-          />
-          <TextInput placeholder="Enter Group Name" style={styles.inputStyle} />
+        <View style={styles.formContainer}>
+          <Text style={styles.formLabel}>Create a New Group</Text>
+          <View>
+            <TextInput
+              placeholder="Enter First and Last Name"
+              style={styles.inputStyle}
+            />
+            <TextInput
+              placeholder="Enter Group Name"
+              style={styles.inputStyle}
+            />
+          </View>
+          <Button inline inverted style={styles.button}>
+            Create
+          </Button>
         </View>
-        <Button inline inverted style={styles.button}>
-          Create
-        </Button>
       </View>
     </DismissKeyboard>
   );
@@ -43,9 +49,14 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     height: 50,
   },
+  formContainer: {
+    bottom: 60,
+    alignItems: "center",
+  },
   formLabel: {
     fontSize: 20,
     color: "#fff",
+    fontWeight: "bold",
   },
   inputStyle: {
     width: 300,
