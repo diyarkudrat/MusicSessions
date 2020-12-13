@@ -13,7 +13,25 @@ const firebaseConfig = {
   measurementId: "G-Q2XCKWXDNT",
 };
 // Initialize Firebase
-firebase.initializeApp(firebaseConfig);
+if (!firebase.apps.length) {
+  firebase.initializeApp(firebaseConfig);
+}
+
 
 export const auth = firebase.auth();
 export const firestore = firebase.firestore();
+
+
+export const createNewGroup = async (name) => {
+  const groupCode = Math.floor(Math.random()*90000) + 10000;
+
+  firestore.collection('Group Rooms').add({
+    name: name,
+    code: groupCode
+  }).then(function() {
+    console.log("document successfully written!");
+  })
+  .catch(function(err) {
+    console.log('Firestore error', err);
+  });
+};

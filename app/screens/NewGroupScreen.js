@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -9,42 +9,39 @@ import {
 } from "react-native";
 import { Button } from "react-native-ios-kit";
 import { IconButton } from "react-native-paper";
+import { createNewGroup } from '../firebase';
 
-const NewGroupScreen = ({ navigation }) => {
-  const DismissKeyboard = ({ children }) => (
-    <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
-      {children}
-    </TouchableWithoutFeedback>
-  );
+function NewGroupScreen({ navigation }) {
+  const [name, setName] = useState('');
+
+  const handleButtonPress = () => {
+    createNewGroup(name);
+  }
 
   return (
-    <DismissKeyboard>
-      <View style={styles.container}>
-        <View style={styles.formContainer}>
-          <Text style={styles.formLabel}>Create a New Group</Text>
-          <View>
-            <TextInput
-              placeholder="Enter First and Last Name"
-              style={styles.inputStyle}
-            />
-            <TextInput
-              placeholder="Enter Group Name"
-              style={styles.inputStyle}
-            />
-          </View>
-          <Button inline inverted style={styles.button}>
-            Create
-          </Button>
-          <IconButton
-            icon="keyboard-backspace"
-            size={30}
-            style={styles.navButton}
-            color="#20E4B5"
-            onPress={() => navigation.goBack()}
+    <View style={styles.container}>
+      <View style={styles.formContainer}>
+        <Text style={styles.formLabel}>Create a New Group</Text>
+        <View>
+          <TextInput
+            placeholder="Enter Group Name"
+            style={styles.inputStyle}
+            defaultValue={name}
+            onChangeText={(text) => setName(text)}
           />
         </View>
+        <Button inline inverted style={styles.button} onPress={handleButtonPress}>
+          Create
+        </Button>
+        <IconButton
+          icon="keyboard-backspace"
+          size={30}
+          style={styles.navButton}
+          color="#20E4B5"
+          onPress={() => navigation.goBack()}
+        />
       </View>
-    </DismissKeyboard>
+    </View>
   );
 };
 
