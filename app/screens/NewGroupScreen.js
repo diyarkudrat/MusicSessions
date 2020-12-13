@@ -8,8 +8,9 @@ import {
   StyleSheet,
 } from "react-native";
 import { Button } from "react-native-ios-kit";
+import { IconButton } from "react-native-paper";
 
-const NewGroupScreen = () => {
+const NewGroupScreen = ({ navigation }) => {
   const DismissKeyboard = ({ children }) => (
     <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
       {children}
@@ -34,6 +35,13 @@ const NewGroupScreen = () => {
           <Button inline inverted style={styles.button}>
             Create
           </Button>
+          <IconButton
+            icon="keyboard-backspace"
+            size={30}
+            style={styles.navButton}
+            color="#20E4B5"
+            onPress={() => navigation.goBack()}
+          />
         </View>
       </View>
     </DismissKeyboard>
@@ -74,6 +82,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     marginTop: 20,
   },
+  navButton: {
+    top: 40
+  }
 });
 
 export default NewGroupScreen;
