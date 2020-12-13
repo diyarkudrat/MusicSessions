@@ -25,13 +25,8 @@ export const firestore = firebase.firestore();
 export const createNewGroup = async (name) => {
   const groupCode = Math.floor(Math.random()*90000) + 10000;
 
-  firestore.collection('Group Rooms').add({
+  await firestore.collection('Group Rooms').add({
     name: name,
     code: groupCode
-  }).then(function() {
-    console.log("document successfully written!");
   })
-  .catch(function(err) {
-    console.log('Firestore error', err);
-  });
 };

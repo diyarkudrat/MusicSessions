@@ -14,8 +14,11 @@ import { createNewGroup } from '../firebase';
 function NewGroupScreen({ navigation }) {
   const [name, setName] = useState('');
 
-  const handleButtonPress = () => {
-    createNewGroup(name);
+  const handleButtonPress = async () => {
+    if (name.length > 0) {
+      await createNewGroup(name);
+    }
+    navigation.navigate('Home');
   }
 
   return (
