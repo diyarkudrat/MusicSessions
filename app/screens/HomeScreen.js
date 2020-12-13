@@ -11,10 +11,13 @@ import {
 } from "react-native";
 import { Button } from "react-native-ios-kit";
 import { AuthContext } from '../navigation/AuthProvider';
+import { getAudioFiles } from '../firebase';
 
 function WelcomeScreen({ navigation }) {
   const { user, logout } = useContext(AuthContext);
   const [groupCode, setGroupCode] = useState("");
+
+  getAudioFiles();
 
   return (
     <SafeAreaView style={styles.container}>

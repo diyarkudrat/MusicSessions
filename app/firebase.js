@@ -20,6 +20,8 @@ if (!firebase.apps.length) {
 
 export const auth = firebase.auth();
 export const firestore = firebase.firestore();
+export const storage = firebase.storage();
+export const storageRef = storage.ref();
 
 
 export const createNewGroup = async (name) => {
@@ -30,3 +32,9 @@ export const createNewGroup = async (name) => {
     code: groupCode
   })
 };
+
+// export const getAudioFiles = async () => {
+//   const fileRef = storageRef.child('Dream.mp3');
+//   const url = await fileRef.getDownloadURL();
+//   return url;
+// }

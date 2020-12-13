@@ -3,6 +3,7 @@ import {createStackNavigator} from '@react-navigation/stack';
 import { IconButton } from 'react-native-paper';
 import HomeScreen from "../screens/HomeScreen";
 import NewGroupScreen from '../screens/NewGroupScreen';
+import GroupScreen from '../screens/GroupScreen';
 
 const MusicSessionStack = createStackNavigator();
 const CreateNewSessionStack = createStackNavigator();
@@ -16,7 +17,7 @@ function MusicSession() {
               options={({ navigation }) => ({
                   headerRight: () => (
                       <IconButton
-                        icon="plus-thick"
+                        icon="plus"
                         size={28}
                         color="black"
                         onPress={() => navigation.navigate('CreateGroup')}
@@ -31,6 +32,7 @@ function MusicSession() {
 function HomeStack(props) {
     return (
         <CreateNewSessionStack.Navigator mode="modal" headerMode="none">
+            {/* <CreateNewSessionStack.Screen name="GroupSession" component={GroupScreen} /> */}
             <CreateNewSessionStack.Screen name="MusicSession" component={MusicSession} />
             <CreateNewSessionStack.Screen name="CreateGroup" component={NewGroupScreen} />
         </CreateNewSessionStack.Navigator>
