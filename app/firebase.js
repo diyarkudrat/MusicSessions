@@ -27,14 +27,21 @@ export const storageRef = storage.ref();
 export const createNewGroup = async (name, user) => {
   const groupCode = Math.floor(Math.random()*90000) + 10000;
   const newRoom = await firestore.collection('Group Rooms').add({
-    name: name,
+    roomName: name,
     code: groupCode,
     leader: user.uid
   });
   const { id } = newRoom;
-  
-  return await getGroupSession(id);
+  const { code, leader, roomName } = await getGroupSession(id);
+  const data = { id, code, leader, roomName }
+  return data;
 };
+
+export const endGroupSession = async (id) => {
+  const groupRef = firestore.collection('Group Rooms');
+  const roomRef = groupRef.doc(id);
+  await roomRef.delete(); 
+}
 
 export const getGroupSession = async (id) => {
   const groupRef = firestore.collection('Group Rooms');

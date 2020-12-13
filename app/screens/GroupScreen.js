@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { SafeAreaView, View, StyleSheet } from "react-native";
 import { Button } from "react-native-ios-kit";
 import AudioPlayer from "../components/AudioPlayer";
+import { endGroupSession } from '../firebase';
 
 
 const audioPlaylist = [
@@ -29,14 +30,18 @@ const audioPlaylist = [
 ];
 
 function GroupScreen({ route, navigation} ) {
-  const { newGroup } = route.params;
+  const { newGroup, user } = route.params;
+
+  const handleButtonPress = async () => {
+    // console.log('id', newGroup.id);
+    await endGroupSession(newGroup.id);
+    navigation.navigate('Home');
+  };
 
   return (
     <SafeAreaView>
       <View style={styles.buttonContainer}>
-        <Button inline inverted style={styles.button} onPress={() => navigation.navigate('Home')}>
-          End Session
-        </Button>
+        { newGroup.leader === user.uid ? <Button inline inverted style={styles.button} onPress={handleButtonPress}>End Session</Button> : null }
         <Button inline inverted style={styles.button} onPress={() => navigation.navigate('Home')}>
           Leave
         </Button>
@@ -64,6 +69,9 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     padding: 10,
+  },
+  container: {
+    backgroundColor: '#2D3F4D'
   },
   musicContainer: {
     justifyContent: "center",

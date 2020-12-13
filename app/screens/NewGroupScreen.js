@@ -16,11 +16,11 @@ function NewGroupScreen({ route, navigation }) {
   const { user } = route.params;
 
   const handleButtonPress = async () => {
-    
     if (name.length > 0) {
       const newGroup = await createNewGroup(name, user);
       navigation.navigate('GroupSession', {
-        newGroup: newGroup
+        newGroup: newGroup,
+        user: user
       });
     }
   }
