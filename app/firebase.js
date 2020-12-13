@@ -26,11 +26,11 @@ export const storageRef = storage.ref();
 
 export const createNewGroup = async (name, user) => {
   const groupCode = Math.floor(Math.random()*90000) + 10000;
-
   await firestore.collection('Group Rooms').add({
     name: name,
-    code: groupCode
-  })
+    code: groupCode,
+    leader: user.uid
+  });
 };
 
 export const generateUserDocument = async (user) => {
