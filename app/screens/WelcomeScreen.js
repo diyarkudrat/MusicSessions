@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import {
   View,
   StyleSheet,
@@ -10,8 +10,10 @@ import {
   Keyboard,
 } from "react-native";
 import { Button } from "react-native-ios-kit";
+import { AuthContext } from '../navigation/AuthProvider';
 
 function WelcomeScreen({ navigation }) {
+  const { user, logout } = useContext(AuthContext);
   const [groupCode, setGroupCode] = useState("");
 
   return (
@@ -40,9 +42,17 @@ function WelcomeScreen({ navigation }) {
             inline
             inverted
             style={styles.button}
-            onPress={() => navigation.navigate("Login")}
+            onPress={() => navigation.navigate("CreateGroup")}
           >
             Create New Group
+          </Button>
+          <Button
+            inline
+            inverted
+            style={styles.button}
+            onPress={() => logout()}
+          >
+            Logout
           </Button>
         </View>
       </View>
@@ -60,6 +70,7 @@ const styles = StyleSheet.create({
     top: 30,
     borderRadius: 30,
     fontWeight: "bold",
+    marginBottom: 15
   },
   buttonContainer: {
     top: 70,

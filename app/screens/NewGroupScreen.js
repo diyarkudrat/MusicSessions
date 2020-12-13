@@ -9,7 +9,7 @@ import {
 } from "react-native";
 import { Button } from "react-native-ios-kit";
 
-const NewGroupForm = () => {
+const NewGroupScreen = () => {
   const DismissKeyboard = ({ children }) => (
     <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
       {children}
@@ -76,4 +76,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default NewGroupForm;
+export default NewGroupScreen;

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import {
   View,
   StyleSheet,
@@ -8,20 +8,12 @@ import {
   Keyboard,
 } from "react-native";
 import { Button } from "react-native-ios-kit";
-import { auth } from '../firebase';
+import { AuthContext } from '../navigation/AuthProvider';
 
 function LoginScreen({ navigation }) {
+  const { login } = useContext(AuthContext);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
-  const signInWithEmailAndPasswordHandler = (event) => {
-    event.preventDefault();
-    auth.signInWithEmailAndPassword(email, password).then(
-      console.log("Login Success!")
-    ).catch(err => {
-      console.log("Login error", err);
-    });
-  };
 
   return (
     <View style={styles.container}>
@@ -42,7 +34,7 @@ function LoginScreen({ navigation }) {
         style={styles.formInput}
         onChangeText={(usePassword) => setPassword(usePassword)}
       />
-      <Button inline inverted style={styles.button} onPress={(event) => signInWithEmailAndPasswordHandler(event)}>
+      <Button inline inverted style={styles.button} onPress={() => login(email, password)}>
         Log In
       </Button>
       <Button

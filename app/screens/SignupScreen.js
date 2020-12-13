@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import {
   View,
   StyleSheet,
@@ -10,25 +10,12 @@ import {
 } from "react-native";
 import { Button } from "react-native-ios-kit";
 import { IconButton } from "react-native-paper";
-import { auth } from "../firebase";
+import { AuthContext } from '../navigation/AuthProvider';
 
 function SignupScreen({ navigation }) {
+  const { register } = useContext(AuthContext);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
-  const createUserWithEmailAndPasswordHandler = async (event) => {
-    event.preventDefault();
-    try {
-      const { user } = await auth.createUserWithEmailAndPassword(
-        email,
-        password
-      );
-    } catch (err) {
-      console.log(err);
-    }
-    setEmail("");
-    setPassword("");
-  };
 
   return (
     <View style={styles.container}>
@@ -53,9 +40,7 @@ function SignupScreen({ navigation }) {
         inline
         inverted
         style={styles.button}
-        onPress={(event) => {
-          createUserWithEmailAndPasswordHandler(event);
-        }}
+        onPress={() => register(email, password)}
       >
         Sign Up
       </Button>
