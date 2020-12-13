@@ -68,7 +68,7 @@ function WelcomeScreen({ navigation }) {
             inverted
             style={styles.button}
             onPress={() => navigation.navigate("CreateGroup", {
-              otherParam: user
+              user: user
             })}
           >
             Create New Group

@@ -28,15 +28,16 @@ const audioPlaylist = [
   },
 ];
 
-function GroupScreen(props) {
+function GroupScreen({ route, navigation} ) {
+  const { newGroup } = route.params;
 
   return (
     <SafeAreaView>
       <View style={styles.buttonContainer}>
-        <Button inline inverted style={styles.button}>
+        <Button inline inverted style={styles.button} onPress={() => navigation.navigate('Home')}>
           End Session
         </Button>
-        <Button inline inverted style={styles.button}>
+        <Button inline inverted style={styles.button} onPress={() => navigation.navigate('Home')}>
           Leave
         </Button>
       </View>

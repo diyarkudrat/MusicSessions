@@ -33,9 +33,9 @@ function HomeStack(props) {
 
     return (
         <CreateNewSessionStack.Navigator mode="modal" headerMode="none">
-            {/* <CreateNewSessionStack.Screen name="GroupSession" component={GroupScreen} /> */}
             <CreateNewSessionStack.Screen name="MusicSession" component={MusicSession} />
             <CreateNewSessionStack.Screen name="CreateGroup" component={NewGroupScreen} />
+            <CreateNewSessionStack.Screen name="GroupSession" component={GroupScreen} />
         </CreateNewSessionStack.Navigator>
     );
 }

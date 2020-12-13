@@ -9,18 +9,20 @@ import {
 } from "react-native";
 import { Button } from "react-native-ios-kit";
 import { IconButton } from "react-native-paper";
-import { createNewGroup } from '../firebase';
+import { createNewGroup, getGroupSession } from '../firebase';
 
 function NewGroupScreen({ route, navigation }) {
   const [name, setName] = useState('');
-
-  const { otherParam } = route.params;
+  const { user } = route.params;
 
   const handleButtonPress = async () => {
+    
     if (name.length > 0) {
-      await createNewGroup(name, otherParam);
+      const newGroup = await createNewGroup(name, user);
+      navigation.navigate('GroupSession', {
+        newGroup: newGroup
+      });
     }
-    navigation.navigate('Home');
   }
 
   return (
