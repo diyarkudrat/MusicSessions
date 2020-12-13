@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import {createStackNavigator} from '@react-navigation/stack';
 import { IconButton } from 'react-native-paper';
 import HomeScreen from "../screens/HomeScreen";
@@ -30,6 +30,7 @@ function MusicSession() {
 }
 
 function HomeStack(props) {
+
     return (
         <CreateNewSessionStack.Navigator mode="modal" headerMode="none">
             {/* <CreateNewSessionStack.Screen name="GroupSession" component={GroupScreen} /> */}

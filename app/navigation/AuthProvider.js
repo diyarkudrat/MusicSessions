@@ -1,5 +1,5 @@
 import React, { createContext, useState } from 'react';
-import { auth } from '../firebase';
+import { auth, generateUserDocument } from '../firebase';
 
 export const AuthContext = createContext({});
 
@@ -20,7 +20,8 @@ export const AuthProvider = ({children}) => {
               },
               register: async (email, password) => {
                   try {
-                      await auth.createUserWithEmailAndPassword(email, password);
+                      const user = await auth.createUserWithEmailAndPassword(email, password);
+                      generateUserDocument(user);
                   } catch (err) {
                       console.log(err);
                   }

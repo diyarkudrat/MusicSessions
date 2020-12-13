@@ -11,12 +11,14 @@ import { Button } from "react-native-ios-kit";
 import { IconButton } from "react-native-paper";
 import { createNewGroup } from '../firebase';
 
-function NewGroupScreen({ navigation }) {
+function NewGroupScreen({ route, navigation }) {
   const [name, setName] = useState('');
+
+  const { otherParam } = route.params;
 
   const handleButtonPress = async () => {
     if (name.length > 0) {
-      await createNewGroup(name);
+      await createNewGroup(name, otherParam);
     }
     navigation.navigate('Home');
   }

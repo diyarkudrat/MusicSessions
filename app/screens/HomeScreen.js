@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import {
   View,
   StyleSheet,
@@ -10,6 +10,7 @@ import {
   Keyboard,
 } from "react-native";
 import { Button } from "react-native-ios-kit";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { AuthContext } from '../navigation/AuthProvider';
 import { getAudioFiles } from '../firebase';
 
@@ -17,7 +18,28 @@ function WelcomeScreen({ navigation }) {
   const { user, logout } = useContext(AuthContext);
   const [groupCode, setGroupCode] = useState("");
 
+  useEffect(() => {
+  })
+
   getAudioFiles();
+
+  const storeFileData = async (value) => {
+    try {
+      const jsonValue = JSON.stringify(value);
+      await AsyncStorage.setItem('fileData', jsonValue);
+    } catch (err) {
+      console.log('storeFileData() error', err);
+    }
+  };
+
+  const getData = async () => {
+    try {
+      const jsonValue = await AsyncStorage.getItem('fileData');
+      return jsonValue != null ? JSON.parse(jsonValue) : null;
+    } catch (err) {
+      console.log('getData() error', err);
+    }
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -45,7 +67,9 @@ function WelcomeScreen({ navigation }) {
             inline
             inverted
             style={styles.button}
-            onPress={() => navigation.navigate("CreateGroup")}
+            onPress={() => navigation.navigate("CreateGroup", {
+              otherParam: user
+            })}
           >
             Create New Group
           </Button>

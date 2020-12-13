@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { SafeAreaView, View, StyleSheet } from "react-native";
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Button } from "react-native-ios-kit";
 import AudioPlayer from "../components/AudioPlayer";
-import getAudioFiles from '../firebase';
+
 
 const audioPlaylist = [
   {
@@ -30,25 +29,6 @@ const audioPlaylist = [
 ];
 
 function GroupScreen(props) {
-
-  const storeData = async (fileData) => {
-    try {
-      const jsonValue = JSON.stringify(fileData);
-      await AsyncStorage.setItem('fileData', jsonValue);
-    } catch (err) {
-      console.log('storeData() error', err);
-    }
-  };
-
-  const getData = async () => {
-    try {
-      const jsonValue = await AsyncStorage.getItem('fileData');
-      console.log(jsonValue);
-      // return jsonValue != null ? JSON.parse(jsonValue) : null;
-    } catch (err) {
-      console.log('getData() error', err);
-    }
-  };
 
   return (
     <SafeAreaView>

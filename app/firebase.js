@@ -24,7 +24,7 @@ export const storage = firebase.storage();
 export const storageRef = storage.ref();
 
 
-export const createNewGroup = async (name) => {
+export const createNewGroup = async (name, user) => {
   const groupCode = Math.floor(Math.random()*90000) + 10000;
 
   await firestore.collection('Group Rooms').add({
@@ -33,8 +33,43 @@ export const createNewGroup = async (name) => {
   })
 };
 
-// export const getAudioFiles = async () => {
-//   const fileRef = storageRef.child('Dream.mp3');
-//   const url = await fileRef.getDownloadURL();
-//   return url;
-// }
+export const generateUserDocument = async (user) => {
+  if (!user) return;
+
+  const userRef = firestore.doc(`Users/${user.uid}`);
+  const snapshot = await userRef.get();
+
+  if (!snapshot.exists) {
+    const { email } = user;
+    try {
+      await userRef.set({
+        email: email,
+        userId: user.uid
+      });
+    } catch (err) {
+      console.log('Error creating user document', err);
+    }
+  }
+  return getUserDocument(user.uid);
+}
+
+const getUserDocument = async (uid) => {
+  if (!uid) return null;
+
+  try {
+    const userDocument = await firestore.doc(`Users/${uid}`).get();
+    return {
+      uid,
+      ...userDocument.data()
+    };
+  } catch (err) {
+    console.log('Error fetching user', err);
+  }
+};
+
+export const getAudioFiles = async () => {
+  const fileRef = storageRef.child('Dream.mp3');
+  const url = await fileRef.getDownloadURL();
+  // console.log('url', url);
+  return url;
+}
