@@ -33,9 +33,11 @@ function GroupScreen({ route, navigation} ) {
   const { newGroup, user } = route.params;
 
   const handleButtonPress = async () => {
-    // console.log('id', newGroup.id);
     await endGroupSession(newGroup.id);
-    navigation.navigate('Home');
+    const endSessionMessage = "You Have Ended the Group Session";
+    navigation.navigate('Home', {
+      message: endSessionMessage
+    });
   };
 
   return (

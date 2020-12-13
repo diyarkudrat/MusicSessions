@@ -14,11 +14,15 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { AuthContext } from '../navigation/AuthProvider';
 import { getAudioFiles } from '../firebase';
 
-function WelcomeScreen({ navigation }) {
+function WelcomeScreen({ route, navigation }) {
   const { user, logout } = useContext(AuthContext);
   const [groupCode, setGroupCode] = useState("");
+  const [endSessionMessage, setEndSessionMessage] = useState("");
 
   useEffect(() => {
+    if (route.params) {
+      setEndSessionMessage(route.params.message);
+    }
   })
 
   getAudioFiles();
@@ -41,8 +45,10 @@ function WelcomeScreen({ navigation }) {
     }
   };
 
+
   return (
     <SafeAreaView style={styles.container}>
+      { endSessionMessage ? alert(endSessionMessage) : null }
       <View style={styles.logoContainer}>
         <Text style={styles.title}>MusicSessions</Text>
         <Image style={styles.logo} source={require("../assets/vinyl.png")} />
