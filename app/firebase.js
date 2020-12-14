@@ -32,7 +32,7 @@ export const createNewGroup = async (name, user) => {
     roomName: name,
     code: groupCode,
     leader: user.uid,
-    users: ['user1', 'user2']
+    users: []
   });
   const { id } = newRoom;
   const { code, leader, roomName } = await getGroupSession(id);
@@ -57,9 +57,8 @@ export const joinGroupSession = async (groupCode, userId) => {
   })
   const roomData = roomRef.data();
   const roomId = roomRef.id;
-  // console.log('roomId', roomRef.id);
+
   const { code, leader, roomName, users } = roomRef.data();
-  // console.log('roomName', roomName);
   const data = { id: roomId, code, leader, roomName, users }
 
   return data;
@@ -76,7 +75,12 @@ export const leaveGroupSession = async (userId, roomId) => {
   const roomRef = await groupRef.doc(roomId).get();
   roomRef.ref.update({
     users: firebase.firestore.FieldValue.arrayRemove(userId)
-  })
+  });
+
+  const { users } = roomRef.data();
+  console.log('users', users);
+
+  // if (roomRef.data().users.lengt)
 
 }
 
