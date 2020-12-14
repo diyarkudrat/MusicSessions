@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { SafeAreaView, View, StyleSheet } from "react-native";
+import { SafeAreaView, View, StyleSheet, Text } from "react-native";
 import { Button } from "react-native-ios-kit";
 import AudioPlayer from "../components/AudioPlayer";
 import { endGroupSession } from '../firebase';
@@ -49,6 +49,8 @@ function GroupScreen({ route, navigation} ) {
         </Button>
       </View>
       <View style={styles.musicContainer}>
+        <Text style={styles.text}>Group Code : {newGroup.code}</Text>
+        <Text style={styles.text}>Group Leader : {user.email}</Text>
         <AudioPlayer audioPlaylist={audioPlaylist} />
       </View>
     </SafeAreaView>
@@ -72,14 +74,18 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     padding: 10,
   },
-  container: {
-    backgroundColor: '#2D3F4D'
-  },
   musicContainer: {
     justifyContent: "center",
     alignItems: "center",
     top: 200,
   },
+  text: {
+    bottom: 50,
+    fontSize: 30,
+    fontWeight: 'bold',
+    color: '#2D3F4D',
+    marginTop: 10
+  }
 });
 
 export default GroupScreen;

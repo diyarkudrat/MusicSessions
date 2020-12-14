@@ -1,4 +1,5 @@
 import * as firebase from "firebase";
+// import * as admin from "firebase-admin";
 import "firebase/auth";
 import "firebase/firestore";
 import "firebase/storage";
@@ -21,6 +22,7 @@ if (!firebase.apps.length) {
 export const auth = firebase.auth();
 export const firestore = firebase.firestore();
 export const storage = firebase.storage();
+// export const fieldValue = admin.firestore.FieldValue;
 export const storageRef = storage.ref();
 
 
@@ -29,7 +31,8 @@ export const createNewGroup = async (name, user) => {
   const newRoom = await firestore.collection('Group Rooms').add({
     roomName: name,
     code: groupCode,
-    leader: user.uid
+    leader: user.uid,
+    users: ['user1', 'user2']
   });
   const { id } = newRoom;
   const { code, leader, roomName } = await getGroupSession(id);
@@ -37,19 +40,40 @@ export const createNewGroup = async (name, user) => {
   return data;
 };
 
-export const endGroupSession = async (id) => {
-  const groupRef = firestore.collection('Group Rooms');
-  const roomRef = groupRef.doc(id);
-  await roomRef.delete(); 
-}
-
-export const getGroupSession = async (id) => {
+const getGroupSession = async (id) => {
   const groupRef = firestore.collection('Group Rooms');
   const snapshot = await groupRef.doc(id).get();
   const data = snapshot.data();
   
   return data;
-}
+};
+
+export const joinGroupSession = async (code, userId) => {
+  const groupRef = firestore.collection('Group Rooms');
+  const querySnapshot = await groupRef.where('code', '==', parseInt(code)).get();
+  const roomRef = querySnapshot.docs[0];
+  roomRef.ref.update({
+    users: firebase.firestore.FieldValue.arrayUnion(userId)
+  })
+  const roomData = roomRef.data();
+
+  return roomData;
+};
+
+export const endGroupSession = async (id) => {
+  const groupRef = firestore.collection('Group Rooms');
+  const roomRef = groupRef.doc(id);
+  await roomRef.delete(); 
+};
+
+
+export const getUserInfo = async (id) => {
+  const userRef = firestore.collection('Users');
+  const snapshot = await userRef.doc(id).get();
+  const userData = snapshot.data();
+
+  return userData;
+};
 
 export const generateUserDocument = async (user) => {
   if (!user) return;
@@ -69,7 +93,7 @@ export const generateUserDocument = async (user) => {
     }
   }
   return getUserDocument(user.uid);
-}
+};
 
 const getUserDocument = async (uid) => {
   if (!uid) return null;
@@ -90,4 +114,4 @@ export const getAudioFiles = async () => {
   const url = await fileRef.getDownloadURL();
   // console.log('url', url);
   return url;
-}
+};

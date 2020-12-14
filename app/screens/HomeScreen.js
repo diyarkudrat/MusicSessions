@@ -12,11 +12,11 @@ import {
 import { Button } from "react-native-ios-kit";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { AuthContext } from '../navigation/AuthProvider';
-import { getAudioFiles } from '../firebase';
+import { getAudioFiles, joinGroupSession } from '../firebase';
 
 function WelcomeScreen({ route, navigation }) {
   const { user, logout } = useContext(AuthContext);
-  const [groupCode, setGroupCode] = useState("");
+  const [groupCode, setGroupCode] = useState(null);
   const [endSessionMessage, setEndSessionMessage] = useState("");
 
   useEffect(() => {
@@ -45,6 +45,9 @@ function WelcomeScreen({ route, navigation }) {
     }
   };
 
+  const joinSession = async () => {
+    await joinGroupSession(groupCode, user.uid);
+  }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -66,6 +69,14 @@ function WelcomeScreen({ route, navigation }) {
             value={groupCode}
             onChangeText={(text) => setGroupCode(text)}
           />
+          <Button
+            inline
+            inverted
+            style={styles.joinButton}
+            onPress={() => joinSession()}
+          >
+            Join Group
+          </Button>
         </View>
         <View style={styles.buttonContainer}>
           <Text style={styles.formLabel}>Or</Text>
@@ -119,10 +130,21 @@ const styles = StyleSheet.create({
   inputStyle: {
     width: 300,
     height: 40,
+    borderRadius: 30,
+    backgroundColor: "#fff",
     paddingHorizontal: 10,
-    backgroundColor: "#B5B5B5",
-    top: 40,
+    marginTop: 20,
+  },
+  joinButton: {
+    backgroundColor: "#20E4B5",
+    height: 50,
+    width: 300,
+    justifyContent: "center",
     alignItems: "center",
+    top: 10,
+    borderRadius: 30,
+    fontWeight: "bold",
+    marginBottom: 15
   },
   logo: {
     top: 30,
