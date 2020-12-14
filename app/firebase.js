@@ -1,5 +1,4 @@
 import * as firebase from "firebase";
-// import * as admin from "firebase-admin";
 import "firebase/auth";
 import "firebase/firestore";
 import "firebase/storage";
@@ -22,7 +21,6 @@ if (!firebase.apps.length) {
 export const auth = firebase.auth();
 export const firestore = firebase.firestore();
 export const storage = firebase.storage();
-// export const fieldValue = admin.firestore.FieldValue;
 export const storageRef = storage.ref();
 
 
@@ -32,7 +30,7 @@ export const createNewGroup = async (name, user) => {
     roomName: name,
     code: groupCode,
     leader: user.uid,
-    users: []
+    users: [user.uid]
   });
   const { id } = newRoom;
   const { code, leader, roomName } = await getGroupSession(id);
@@ -66,7 +64,7 @@ export const joinGroupSession = async (groupCode, userId) => {
 
 export const endGroupSession = async (id) => {
   const groupRef = firestore.collection('Group Rooms');
-  const roomRef = groupRef.doc(id);
+  const roomRef = await groupRef.doc(id);
   await roomRef.delete(); 
 };
 
@@ -77,12 +75,38 @@ export const leaveGroupSession = async (userId, roomId) => {
     users: firebase.firestore.FieldValue.arrayRemove(userId)
   });
 
-  const { users } = roomRef.data();
-  console.log('users', users);
-
-  // if (roomRef.data().users.lengt)
-
+  try {
+    const docRef = groupRef
+      .doc(roomId)
+      .onSnapshot(doc => {
+        if (doc.data()) {
+          docRef();
+          endGroupSession(roomId);
+        } else {
+          const sessionUsers = doc.data().users;
+          const sessionLeader = doc.data().leader;
+        
+          if (!sessionUsers.includes(sessionLeader)) {
+            electNewLeader(sessionUsers, sessionLeader, roomRef);
+          }
+        }
+      })
+  } catch (err) {
+    console.log(err);
+  }
 }
+
+const electNewLeader = (users, leader, roomRef) => {
+  let electLeaderUsers = {};
+
+  users.forEach(user => {
+    electLeaderUsers[user] = 0;
+  });
+
+  roomRef.ref.update({
+    electLeader: electLeaderUsers
+  });
+};
 
 export const getUserInfo = async (id) => {
   const userRef = firestore.collection('Users');
