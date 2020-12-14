@@ -46,7 +46,12 @@ function WelcomeScreen({ route, navigation }) {
   };
 
   const joinSession = async () => {
-    await joinGroupSession(groupCode, user.uid);
+    const groupSession = await joinGroupSession(groupCode, user.uid);
+
+    navigation.navigate('GroupSession', {
+      newGroup: groupSession,
+      user: user
+    })
   }
 
   return (
