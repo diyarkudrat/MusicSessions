@@ -18,10 +18,12 @@ function WelcomeScreen({ route, navigation }) {
   const { user, logout } = useContext(AuthContext);
   const [groupCode, setGroupCode] = useState(null);
   const [endSessionMessage, setEndSessionMessage] = useState("");
+  const [leaveSessionMessage, setLeaveSessionMessage] = useState("");
 
   useEffect(() => {
     if (route.params) {
-      setEndSessionMessage(route.params.message);
+      setEndSessionMessage(route.params.endMessage);
+      setLeaveSessionMessage(route.params.leaveMessage);
     }
   })
 
@@ -57,6 +59,7 @@ function WelcomeScreen({ route, navigation }) {
   return (
     <SafeAreaView style={styles.container}>
       { endSessionMessage ? alert(endSessionMessage) : null }
+      { leaveSessionMessage ? alert(leaveSessionMessage) : null }
       <View style={styles.logoContainer}>
         <Text style={styles.title}>MusicSessions</Text>
         <Image style={styles.logo} source={require("../assets/vinyl.png")} />

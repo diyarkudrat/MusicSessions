@@ -36,7 +36,7 @@ export const createNewGroup = async (name, user) => {
   });
   const { id } = newRoom;
   const { code, leader, roomName } = await getGroupSession(id);
-  const data = { id, code, leader, roomName }
+  const data = { id, code, leader, roomName };
   return data;
 };
 
@@ -48,16 +48,21 @@ const getGroupSession = async (id) => {
   return data;
 };
 
-export const joinGroupSession = async (code, userId) => {
+export const joinGroupSession = async (groupCode, userId) => {
   const groupRef = firestore.collection('Group Rooms');
-  const querySnapshot = await groupRef.where('code', '==', parseInt(code)).get();
+  const querySnapshot = await groupRef.where('code', '==', parseInt(groupCode)).get();
   const roomRef = querySnapshot.docs[0];
   roomRef.ref.update({
     users: firebase.firestore.FieldValue.arrayUnion(userId)
   })
   const roomData = roomRef.data();
+  const roomId = roomRef.id;
+  // console.log('roomId', roomRef.id);
+  const { code, leader, roomName, users } = roomRef.data();
+  // console.log('roomName', roomName);
+  const data = { id: roomId, code, leader, roomName, users }
 
-  return roomData;
+  return data;
 };
 
 export const endGroupSession = async (id) => {
@@ -66,6 +71,14 @@ export const endGroupSession = async (id) => {
   await roomRef.delete(); 
 };
 
+export const leaveGroupSession = async (userId, roomId) => {
+  const groupRef = firestore.collection('Group Rooms');
+  const roomRef = await groupRef.doc(roomId).get();
+  roomRef.ref.update({
+    users: firebase.firestore.FieldValue.arrayRemove(userId)
+  })
+
+}
 
 export const getUserInfo = async (id) => {
   const userRef = firestore.collection('Users');

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { SafeAreaView, View, StyleSheet, Text } from "react-native";
 import { Button } from "react-native-ios-kit";
 import AudioPlayer from "../components/AudioPlayer";
-import { endGroupSession } from '../firebase';
+import { endGroupSession, leaveGroupSession } from '../firebase';
 
 
 const audioPlaylist = [
@@ -32,19 +32,29 @@ const audioPlaylist = [
 function GroupScreen({ route, navigation} ) {
   const { newGroup, user } = route.params;
 
-  const handleButtonPress = async () => {
+  const endSession = async () => {
     await endGroupSession(newGroup.id);
-    const endSessionMessage = "You Have Ended the Group Session";
+    const endSessionMessage = `You have Ended ${newGroup.roomName}`;
     navigation.navigate('Home', {
-      message: endSessionMessage
+      endMessage: endSessionMessage,
+      leaveMessage: null
     });
   };
+
+  const leaveSession = async () => {
+    await leaveGroupSession(user.uid, newGroup.id);
+    const leaveSessionMessage = `You have left ${newGroup.roomName}`;
+    navigation.navigate('Home', {
+      leaveMessage: leaveSessionMessage,
+      endMessage: null
+    })
+  }
 
   return (
     <SafeAreaView>
       <View style={styles.buttonContainer}>
-        { newGroup.leader === user.uid ? <Button inline inverted style={styles.button} onPress={handleButtonPress}>End Session</Button> : null }
-        <Button inline inverted style={styles.button} onPress={() => navigation.navigate('Home')}>
+        { newGroup.leader === user.uid ? <Button inline inverted style={styles.button} onPress={endSession}>End Session</Button> : null }
+        <Button inline inverted style={styles.button} onPress={leaveSession}>
           Leave
         </Button>
       </View>
