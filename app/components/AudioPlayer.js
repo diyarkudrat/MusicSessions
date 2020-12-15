@@ -36,9 +36,9 @@ export default class App extends React.Component {
   // }
 
   async updateIsPlaying(songId, isPlaying) {
-    const songsRef = firestore.collection('Songs');
-    const docRef = await songsRef.doc(songId).get();
-    docRef.ref.update({
+    const roomId = this.props.roomId;
+    const songsRef = firestore.collection('Group Rooms').doc(roomId).collection('Songs');
+    songsRef.doc(songId).update({
       isPlaying: isPlaying
     })
   };
@@ -87,7 +87,6 @@ export default class App extends React.Component {
     if (playbackInstance) {
       await playbackInstance.unloadAsync();
       await this.updateIsPlaying(this.props.audioFiles[currentIndex].id, false);
-      // console.log('CURRENT SONG ID', this.props.audioFiles[currentIndex].id);
       currentIndex < 1
         ? currentIndex = this.props.audioFiles.length - 1
         : currentIndex -= 1;

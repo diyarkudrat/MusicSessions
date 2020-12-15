@@ -34,6 +34,7 @@ export const createNewGroup = async (name, user) => {
   const { id } = newRoom;
   const { code, leader, roomName } = await getGroupSession(id);
   const data = { id, code, leader, roomName };
+
   return data;
 };
 
@@ -211,9 +212,10 @@ const getUserDocument = async (uid) => {
   }
 };
 
-export const getAudioFiles = async () => {
-  const storageRef = firestore.collection('Songs');
-  const docRef = await storageRef.get();
+export const getAudioFiles = async (roomId) => {
+  const songsRef = firestore.collection('Songs');
+  const roomRef = firestore.collection('Group Rooms').doc(roomId).collection('Songs');
+  const docRef = await songsRef.get();
   const docs = docRef.docs;
   const playlist = [];
 
@@ -221,7 +223,15 @@ export const getAudioFiles = async () => {
     const { fileName, url } = docs[i].data();
     const uri = await downloadAudioFiles(url, fileName);
 
-    playlist.push({ title: fileName, uri: uri, id: docs[i].id });
+    const newSongDoc = await roomRef.add({
+      fileName,
+      isPlaying: false,
+      url
+    });
+
+    const { id } = newSongDoc;
+
+    playlist.push({ title: fileName, uri: uri, id: id });
   }
 
   return playlist;

@@ -22,7 +22,7 @@ function GroupScreen({ route, navigation} ) {
         setSessionUsers(users);
       })
 
-      const files = await getAudioFiles();
+      const files = await getAudioFiles(newGroup.id);
       console.log('FILES', files);
       setAudioFiles(files);
       
@@ -69,7 +69,7 @@ function GroupScreen({ route, navigation} ) {
           users: sessionUsers,
           roomId: newGroup.id,
         })}>Vote for New Leader</Button> : null }
-        { audioFiles ? <AudioPlayer audioFiles={audioFiles} /> : null }
+        { audioFiles ? <AudioPlayer audioFiles={audioFiles} roomId={newGroup.id} /> : null }
       </View>
     </SafeAreaView>
   );

@@ -21,10 +21,10 @@ function WelcomeScreen({ route, navigation }) {
   const [leaveSessionMessage, setLeaveSessionMessage] = useState("");
 
   useEffect(() => {
-    if (route.params) {
-      setEndSessionMessage(route.params.endMessage);
-      setLeaveSessionMessage(route.params.leaveMessage);
-    }
+    // if (route.params) {
+    //   setEndSessionMessage(route.params.endMessage);
+    //   setLeaveSessionMessage(route.params.leaveMessage);
+    // }
   })
 
   const joinSession = async () => {
