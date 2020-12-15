@@ -221,7 +221,7 @@ export const getAudioFiles = async () => {
     const { fileName, url } = docs[i].data();
     const uri = await downloadAudioFiles(url, fileName);
 
-    playlist.push({ title: fileName, uri: uri });
+    playlist.push({ title: fileName, uri: uri, id: docs[i].id });
   }
 
   return playlist;

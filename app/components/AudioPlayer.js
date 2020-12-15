@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from "react";
 import { TouchableOpacity, View, Image, StyleSheet, Text } from "react-native";
 import { Ionicons, AntDesign } from "@expo/vector-icons";
 import { Audio } from "expo-av";
+import { firestore } from '../firebase';
 
 export default class App extends React.Component {
   state = {
@@ -29,6 +30,18 @@ export default class App extends React.Component {
       console.log(e)
     }
   }
+
+  // componentDidUpdate() {
+    
+  // }
+
+  async updateIsPlaying(songId, isPlaying) {
+    const songsRef = firestore.collection('Songs');
+    const docRef = await songsRef.doc(songId).get();
+    docRef.ref.update({
+      isPlaying: isPlaying
+    })
+  };
 
   async loadAudio() {
     const {currentIndex, isPlaying, volume} = this.state
@@ -65,16 +78,23 @@ export default class App extends React.Component {
     this.setState({
       isPlaying: !isPlaying
     })
+
+    // await this.updateIsPlaying()
   }
 
   handlePreviousTrack = async () => {
     let { playbackInstance, currentIndex } = this.state
     if (playbackInstance) {
-      await playbackInstance.unloadAsync()
-      currentIndex < this.props.audioFiles.length - 1 ? (currentIndex -= 1) : (currentIndex = 0)
+      await playbackInstance.unloadAsync();
+      await this.updateIsPlaying(this.props.audioFiles[currentIndex].id, false);
+      // console.log('CURRENT SONG ID', this.props.audioFiles[currentIndex].id);
+      currentIndex < 1
+        ? currentIndex = this.props.audioFiles.length - 1
+        : currentIndex -= 1;
       this.setState({
         currentIndex
       })
+      await this.updateIsPlaying(this.props.audioFiles[currentIndex].id, true);
       this.loadAudio()
     }
   }
@@ -83,10 +103,14 @@ export default class App extends React.Component {
     let { playbackInstance, currentIndex } = this.state
     if (playbackInstance) {
       await playbackInstance.unloadAsync()
-      currentIndex < this.props.audioFiles.length - 1 ? (currentIndex += 1) : (currentIndex = 0)
+      await this.updateIsPlaying(this.props.audioFiles[currentIndex].id, false);
+      currentIndex < this.props.audioFiles.length - 1
+        ? currentIndex = currentIndex + 1
+        : currentIndex = 0;
       this.setState({
         currentIndex
       })
+      await this.updateIsPlaying(this.props.audioFiles[currentIndex].id, true);
       this.loadAudio()
     }
   }
