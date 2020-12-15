@@ -5,13 +5,12 @@ import "firebase/storage";
 import downloadAudioFiles from './fileSystem';
 
 const firebaseConfig = {
-  apiKey: "AIzaSyDTdlaw_N7P4tnZWmu85djbNhaW9zfPCmc",
-  authDomain: "react-native-take-home.firebaseapp.com",
-  projectId: "react-native-take-home",
-  storageBucket: "react-native-take-home.appspot.com",
-  messagingSenderId: "97743295721",
-  appId: "1:97743295721:web:bfef52dcf4bda369084c78",
-  measurementId: "G-Q2XCKWXDNT",
+  apiKey: "AIzaSyBt1qWYaLiOjfQlEQOFFeew2DRbE4ChZcw",
+  authDomain: "music-sesssions-rn.firebaseapp.com",
+  projectId: "music-sesssions-rn",
+  storageBucket: "music-sesssions-rn.appspot.com",
+  messagingSenderId: "103972053125",
+  appId: "1:103972053125:web:2b77a96936ce57fa0409ec"
 };
 // Initialize Firebase
 if (!firebase.apps.length) {
@@ -21,6 +20,8 @@ if (!firebase.apps.length) {
 
 export const auth = firebase.auth();
 export const firestore = firebase.firestore();
+
+const MAX_SONGS = 3;
 
 
 export const createNewGroup = async (name, user) => {
@@ -220,16 +221,19 @@ export const getAudioFiles = async (roomId) => {
   const playlist = [];
 
   for (const i in docs) {
+    let id;
     const { fileName, url } = docs[i].data();
+    const isCollection = await roomRef.get();
     const uri = await downloadAudioFiles(url, fileName);
 
-    const newSongDoc = await roomRef.add({
-      fileName,
-      isPlaying: false,
-      url
-    });
+    if (isCollection.docs.length != MAX_SONGS) {
+      const newSongDoc = await roomRef.add({
+        fileName,
+        isPlaying: false,
+      });
+      id = newSongDoc;
+    };
 
-    const { id } = newSongDoc;
 
     playlist.push({ title: fileName, uri: uri, id: id });
   }

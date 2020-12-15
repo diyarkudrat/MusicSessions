@@ -86,14 +86,14 @@ export default class App extends React.Component {
     let { playbackInstance, currentIndex } = this.state
     if (playbackInstance) {
       await playbackInstance.unloadAsync();
-      await this.updateIsPlaying(this.props.audioFiles[currentIndex].id, false);
+      // await this.updateIsPlaying(this.props.audioFiles[currentIndex].id, false);
       currentIndex < 1
         ? currentIndex = this.props.audioFiles.length - 1
         : currentIndex -= 1;
       this.setState({
         currentIndex
       })
-      await this.updateIsPlaying(this.props.audioFiles[currentIndex].id, true);
+      // await this.updateIsPlaying(this.props.audioFiles[currentIndex].id, true);
       this.loadAudio()
     }
   }
@@ -102,14 +102,14 @@ export default class App extends React.Component {
     let { playbackInstance, currentIndex } = this.state
     if (playbackInstance) {
       await playbackInstance.unloadAsync()
-      await this.updateIsPlaying(this.props.audioFiles[currentIndex].id, false);
+      // await this.updateIsPlaying(this.props.audioFiles[currentIndex].id, false);
       currentIndex < this.props.audioFiles.length - 1
         ? currentIndex = currentIndex + 1
         : currentIndex = 0;
       this.setState({
         currentIndex
       })
-      await this.updateIsPlaying(this.props.audioFiles[currentIndex].id, true);
+      // await this.updateIsPlaying(this.props.audioFiles[currentIndex].id, true);
       this.loadAudio()
     }
   }
