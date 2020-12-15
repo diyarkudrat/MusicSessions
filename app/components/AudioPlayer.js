@@ -1,19 +1,19 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { TouchableOpacity, View, Image, StyleSheet, Text } from "react-native";
 import { Ionicons, AntDesign } from "@expo/vector-icons";
 import { Audio } from "expo-av";
 
-function AudioPlayer(props) {
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [playbackInstance, setPlaybackInstance] = useState(null);
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [volume, setVolume] = useState(1.0);
-  const [isBuffering, setIsBuffering] = useState(false);
+export default class App extends React.Component {
+  state = {
+    isPlaying: false,
+    playbackInstance: null,
+    currentIndex: 0,
+    volume: 1.0,
+    isBuffering: false
+  }
 
-  const soundObject = new Audio.Sound();
-
-  useEffect(() => {
-    async function fetchData() {
+  async componentDidMount() {
+    try {
       await Audio.setAudioModeAsync({
         allowsRecordingIOS: false,
         interruptionModeIOS: Audio.INTERRUPTION_MODE_IOS_DO_NOT_MIX,
@@ -21,90 +21,122 @@ function AudioPlayer(props) {
         interruptionModeAndroid: Audio.INTERRUPTION_MODE_ANDROID_DUCK_OTHERS,
         shouldDuckAndroid: true,
         staysActiveInBackground: true,
-        playThroughEarpieceAndroid: true,
-      });
-
-      loadAudio();
+        playThroughEarpieceAndroid: true
+      })
+ 
+      this.loadAudio()
+    } catch (e) {
+      console.log(e)
     }
-    fetchData();
-  }, []);
-  
-  const loadAudio = async () => {
+  }
+
+  async loadAudio() {
+    const {currentIndex, isPlaying, volume} = this.state
+   
     try {
-      const source = { uri: props.audioFiles[currentIndex].uri };
+      const playbackInstance = new Audio.Sound()
+      const source = {
+        uri: this.props.audioFiles[currentIndex].uri
+      }
+   
       const status = {
         shouldPlay: isPlaying,
-        volume,
-      };
-      soundObject.setOnPlaybackStatusUpdate(setIsBuffering(status.isBuffering));
-      await soundObject.loadAsync(source, status, false);
-      setPlaybackInstance(soundObject);
-    } catch (err) {
-      console.log(err);
+        volume
+      }
+   
+      playbackInstance.setOnPlaybackStatusUpdate(this.onPlaybackStatusUpdate)     
+      await playbackInstance.loadAsync(source, status, false)
+      this.setState({playbackInstance})
+    } catch (e) {
+        console.log(e)
     }
-  };
+  }
 
-  const handlePlayPause = async () => {
-    isPlaying
-      ? await playbackInstance.pauseAsync()
-      : await playbackInstance.playAsync();
-    setIsPlaying(!isPlaying);
-  };
+  onPlaybackStatusUpdate = status => {
+    this.setState({
+      isBuffering: status.isBuffering
+    })
+  }
 
-  const handlePreviousTrack = async () => {
+  handlePlayPause = async () => {
+    const { isPlaying, playbackInstance } = this.state
+    isPlaying ? await playbackInstance.pauseAsync() : await playbackInstance.playAsync()
+ 
+    this.setState({
+      isPlaying: !isPlaying
+    })
+  }
+
+  handlePreviousTrack = async () => {
+    let { playbackInstance, currentIndex } = this.state
     if (playbackInstance) {
-      await playbackInstance.unloadAsync();
-      currentIndex < 1
-        ? setCurrentIndex(props.audioFiles.length - 1)
-        : setCurrentIndex(currentIndex - 1);
-      loadAudio();
+      await playbackInstance.unloadAsync()
+      currentIndex < this.props.audioFiles.length - 1 ? (currentIndex -= 1) : (currentIndex = 0)
+      this.setState({
+        currentIndex
+      })
+      this.loadAudio()
     }
-  };
+  }
 
-  const handleNextTrack = async () => {
+  handleNextTrack = async () => {
+    let { playbackInstance, currentIndex } = this.state
     if (playbackInstance) {
-      await playbackInstance.unloadAsync();
-      currentIndex < props.audioFiles.length - 1
-        ? setCurrentIndex(currentIndex + 1)
-        : setCurrentIndex(0);
+      await playbackInstance.unloadAsync()
+      currentIndex < this.props.audioFiles.length - 1 ? (currentIndex += 1) : (currentIndex = 0)
+      this.setState({
+        currentIndex
+      })
+      this.loadAudio()
     }
-  };
+  }
 
-  const renderFileInfo = () => {
+  renderFileInfo() {
+    const { playbackInstance, currentIndex } = this.state
     return playbackInstance ? (
       <View style={styles.trackInfo}>
         <Text style={[styles.trackInfoText, styles.largeText]}>
-          {props.audioFiles[currentIndex].title}
+          {this.props.audioFiles[currentIndex].title}
+        </Text>
+        <Text style={[styles.trackInfoText, styles.smallText]}>
+          {this.props.audioFiles[currentIndex].author}
+        </Text>
+        <Text style={[styles.trackInfoText, styles.smallText]}>
+          {this.props.audioFiles[currentIndex].source}
         </Text>
       </View>
-    ) : null;
-  };
+    ) : null
+  }
 
-  return (
-    <>
+  render() {
+    return (
       <View style={styles.container}>
+        <Image
+          style={styles.albumCover}
+          source={require('../assets/vinyl.png')}
+        />
         <View style={styles.controls}>
           <TouchableOpacity
             style={styles.control}
-            onPress={handlePreviousTrack}
+            onPress={this.handlePreviousTrack}
           >
             <AntDesign name="stepbackward" size={45} color="#444" />
           </TouchableOpacity>
-          <TouchableOpacity style={styles.control} onPress={handlePlayPause}>
-            {isPlaying ? (
+          <TouchableOpacity style={styles.control} onPress={this.handlePlayPause}>
+            {this.state.isPlaying ? (
               <Ionicons name="ios-pause" size={48} color="#444" />
             ) : (
               <Ionicons name="ios-play-circle" size={48} color="#444" />
             )}
           </TouchableOpacity>
-          <TouchableOpacity style={styles.control} onPress={handleNextTrack}>
+          <TouchableOpacity style={styles.control} onPress={this.handleNextTrack}>
             <AntDesign name="stepforward" size={45} color="#444" />
           </TouchableOpacity>
         </View>
-        {renderFileInfo()}
+        {this.renderFileInfo()}
       </View>
-    </>
-  );
+    )
+  }
 }
 
 const styles = StyleSheet.create({
@@ -134,4 +166,135 @@ const styles = StyleSheet.create({
   },
 });
 
-export default AudioPlayer;
+
+// function AudioPlayer(props) {
+//   const [isPlaying, setIsPlaying] = useState(false);
+//   const [playbackInstance, setPlaybackInstance] = useState(null);
+//   const [currentIndex, setCurrentIndex] = useState(0);
+//   const [volume, setVolume] = useState(1.0);
+//   const [isBuffering, setIsBuffering] = useState(false);
+
+//   const soundObject = new Audio.Sound();
+
+//   useEffect(() => {
+//     async function fetchData() {
+//       await Audio.setAudioModeAsync({
+//         allowsRecordingIOS: false,
+//         interruptionModeIOS: Audio.INTERRUPTION_MODE_IOS_DO_NOT_MIX,
+//         playsInSilentModeIOS: true,
+//         interruptionModeAndroid: Audio.INTERRUPTION_MODE_ANDROID_DUCK_OTHERS,
+//         shouldDuckAndroid: true,
+//         staysActiveInBackground: true,
+//         playThroughEarpieceAndroid: true,
+//       });
+
+//       loadAudio();
+//     }
+//     fetchData();
+//   }, []);
+
+//   const loadAudio = async () => {
+//     try {
+//       console.log('PROPS', props);
+//       const source = { uri: props.audioFiles[currentIndex].uri };
+//       const status = {
+//         shouldPlay: isPlaying,
+//         volume,
+//       };
+//       soundObject.setOnPlaybackStatusUpdate(setIsBuffering(status.isBuffering));
+//       await soundObject.loadAsync(source, status, false);
+//       setPlaybackInstance(soundObject);
+//     } catch (err) {
+//       console.log(err);
+//     }
+//   };
+
+//   const handlePlayPause = async () => {
+//     isPlaying
+//       ? await playbackInstance.pauseAsync()
+//       : await playbackInstance.playAsync();
+//     setIsPlaying(!isPlaying);
+//   };
+
+//   const handlePreviousTrack = async () => {
+//     if (playbackInstance) {
+//       await playbackInstance.unloadAsync();
+//       currentIndex < 1
+//         ? setCurrentIndex(props.audioFiles.length - 1)
+//         : setCurrentIndex(currentIndex - 1);
+//       loadAudio();
+//     }
+//   };
+
+//   const handleNextTrack = async () => {
+//     if (playbackInstance) {
+//       await playbackInstance.unloadAsync();
+//       currentIndex < props.audioFiles.length - 1
+//         ? setCurrentIndex(currentIndex + 1)
+//         : setCurrentIndex(0);
+//     }
+//   };
+
+//   const renderFileInfo = () => {
+//     return playbackInstance ? (
+//       <View style={styles.trackInfo}>
+//         <Text style={[styles.trackInfoText, styles.largeText]}>
+//           {props.audioFiles[currentIndex].title}
+//         </Text>
+//       </View>
+//     ) : null;
+//   };
+
+//   return (
+//     <View style={styles.container}>
+//       <View style={styles.controls}>
+//         <TouchableOpacity
+//           style={styles.control}
+//           onPress={handlePreviousTrack}
+//         >
+//           <AntDesign name="stepbackward" size={45} color="#444" />
+//         </TouchableOpacity>
+//         <TouchableOpacity style={styles.control} onPress={handlePlayPause}>
+//           {isPlaying ? (
+//             <Ionicons name="ios-pause" size={48} color="#444" />
+//           ) : (
+//             <Ionicons name="ios-play-circle" size={48} color="#444" />
+//           )}
+//         </TouchableOpacity>
+//         <TouchableOpacity style={styles.control} onPress={handleNextTrack}>
+//           <AntDesign name="stepforward" size={45} color="#444" />
+//         </TouchableOpacity>
+//       </View>
+//       {renderFileInfo()}
+//     </View>
+//   );
+// }
+
+// const styles = StyleSheet.create({
+//   container: {
+//     alignItems: "center",
+//     justifyContent: "center",
+//   },
+//   albumCover: {
+//     width: 250,
+//     height: 250,
+//   },
+//   control: {
+//     margin: 20,
+//   },
+//   controls: {
+//     flexDirection: "row",
+//   },
+//   largeText: {
+//     fontSize: 30,
+//   },
+//   trackInfo: {
+//     padding: 40,
+//   },
+//   trackInfoText: {
+//     textAlign: "center",
+//     flexWrap: "wrap",
+//   },
+// });
+
+// export default AudioPlayer;

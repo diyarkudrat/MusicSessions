@@ -10,9 +10,8 @@ import {
   Keyboard,
 } from "react-native";
 import { Button } from "react-native-ios-kit";
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { AuthContext } from '../navigation/AuthProvider';
-import { getAudioFiles, joinGroupSession } from '../firebase';
+import { joinGroupSession } from '../firebase';
 
 
 function WelcomeScreen({ route, navigation }) {
@@ -27,24 +26,6 @@ function WelcomeScreen({ route, navigation }) {
       setLeaveSessionMessage(route.params.leaveMessage);
     }
   })
-
-  const storeFileData = async (value) => {
-    try {
-      const jsonValue = JSON.stringify(value);
-      await AsyncStorage.setItem('fileData', jsonValue);
-    } catch (err) {
-      console.log('storeFileData() error', err);
-    }
-  };
-
-  const getData = async () => {
-    try {
-      const jsonValue = await AsyncStorage.getItem('fileData');
-      return jsonValue != null ? JSON.parse(jsonValue) : null;
-    } catch (err) {
-      console.log('getData() error', err);
-    }
-  };
 
   const joinSession = async () => {
     const groupSession = await joinGroupSession(groupCode, user.uid);

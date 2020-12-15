@@ -2,6 +2,7 @@ import * as firebase from "firebase";
 import "firebase/auth";
 import "firebase/firestore";
 import "firebase/storage";
+import downloadAudioFiles from './fileSystem';
 
 const firebaseConfig = {
   apiKey: "AIzaSyDTdlaw_N7P4tnZWmu85djbNhaW9zfPCmc",
@@ -82,7 +83,7 @@ export const leaveGroupSession = async (userId, roomId) => {
       users: firebase.firestore.FieldValue.arrayRemove(userId)
     });
 
-    groupRef
+    const docRef = groupRef
       .doc(roomId)
       .onSnapshot(doc => {
         if (doc.data().users.length === 0) {
@@ -210,9 +211,18 @@ const getUserDocument = async (uid) => {
   }
 };
 
-export const getAudioDocuments = async () => {
+export const getAudioFiles = async () => {
   const storageRef = firestore.collection('Songs');
   const docRef = await storageRef.get();
-  
-  return docRef;
+  const docs = docRef.docs;
+  const playlist = [];
+
+  for (const i in docs) {
+    const { fileName, url } = docs[i].data();
+    const uri = await downloadAudioFiles(url, fileName);
+
+    playlist.push({ title: fileName, uri: uri });
+  }
+
+  return playlist;
 };

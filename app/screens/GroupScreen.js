@@ -2,8 +2,7 @@ import React, { useState, useEffect } from "react";
 import { SafeAreaView, View, StyleSheet, Text } from "react-native";
 import { Button } from "react-native-ios-kit";
 import AudioPlayer from "../components/AudioPlayer";
-import { endGroupSession, leaveGroupSession, getLeaderValue, getAudioDocuments, firestore } from '../firebase';
-import downloadAudioFiles from '../fileSystem';
+import { endGroupSession, leaveGroupSession, getLeaderValue, getAudioFiles, firestore } from '../firebase';
 
 
 function GroupScreen({ route, navigation} ) {
@@ -13,6 +12,7 @@ function GroupScreen({ route, navigation} ) {
   const [audioFiles, setAudioFiles] = useState();
   
   useEffect(() => {
+    let isCancelled = true;
     async function fetchData() {
       const groupRef = firestore.collection('Group Rooms');
 
@@ -22,17 +22,13 @@ function GroupScreen({ route, navigation} ) {
         setSessionUsers(users);
       })
 
-      const audioDocs = await getAudioDocuments();
-      let playlist = [];
-      audioDocs.docs.map(async (doc) => {
-        const { fileName, url } = doc.data();
-        const uri = await downloadAudioFiles(url, fileName);
-        playlist.push({ title: fileName, uri: uri });
-      });
-      setAudioFiles(playlist);
+      const files = await getAudioFiles();
+      console.log('FILES', files);
+      setAudioFiles(files);
       
     }
     fetchData();
+    return () => { isCancelled = false };
   }, []);
 
 
@@ -73,7 +69,7 @@ function GroupScreen({ route, navigation} ) {
           users: sessionUsers,
           roomId: newGroup.id,
         })}>Vote for New Leader</Button> : null }
-        <AudioPlayer audioFiles={audioFiles} />
+        { audioFiles ? <AudioPlayer audioFiles={audioFiles} /> : null }
       </View>
     </SafeAreaView>
   );
