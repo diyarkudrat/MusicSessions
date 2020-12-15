@@ -2,37 +2,15 @@ import React, { useState, useEffect } from "react";
 import { SafeAreaView, View, StyleSheet, Text } from "react-native";
 import { Button } from "react-native-ios-kit";
 import AudioPlayer from "../components/AudioPlayer";
-import { endGroupSession, leaveGroupSession, getLeaderValue, firestore } from '../firebase';
+import { endGroupSession, leaveGroupSession, getLeaderValue, getAudioDocuments, firestore } from '../firebase';
+import downloadAudioFiles from '../fileSystem';
 
-
-const audioPlaylist = [
-  {
-    title: "Audio #1",
-    uri:
-      "https://ia800204.us.archive.org/11/items/hamlet_0911_librivox/hamlet_act1_shakespeare.mp3",
-    imgSource:
-      "http://www.archive.org/download/LibrivoxCdCoverArt8/hamlet_1104.jpg",
-  },
-  {
-    title: "Audio #2",
-    uri:
-      "https://ia600204.us.archive.org/11/items/hamlet_0911_librivox/hamlet_act2_shakespeare.mp3",
-    imgSource:
-      "http://www.pngmart.com/files/7/Red-Smoke-Transparent-Images-PNG.png",
-  },
-  {
-    title: "Audio #3",
-    uri:
-      "http://www.archive.org/download/hamlet_0911_librivox/hamlet_act3_shakespeare.mp3",
-    imgSource:
-      "http://www.archive.org/download/LibrivoxCdCoverArt8/hamlet_1104.jpg",
-  },
-];
 
 function GroupScreen({ route, navigation} ) {
   const { newGroup, user } = route.params;
   const [leaderValue, setLeaderValue] = useState("");
   const [sessionUsers, setSessionUsers] = useState([]);
+  const [audioFiles, setAudioFiles] = useState();
   
   useEffect(() => {
     async function fetchData() {
@@ -42,11 +20,21 @@ function GroupScreen({ route, navigation} ) {
         const { leader, users } = doc.data();
         setLeaderValue(leader);
         setSessionUsers(users);
-
       })
+
+      const audioDocs = await getAudioDocuments();
+      let playlist = [];
+      audioDocs.docs.map(async (doc) => {
+        const { fileName, url } = doc.data();
+        const uri = await downloadAudioFiles(url, fileName);
+        playlist.push({ title: fileName, uri: uri });
+      });
+      setAudioFiles(playlist);
+      
     }
     fetchData();
   }, []);
+
 
   const endSession = async () => {
     const endSessionMessage = `You have Ended ${newGroup.roomName}`;
@@ -85,7 +73,7 @@ function GroupScreen({ route, navigation} ) {
           users: sessionUsers,
           roomId: newGroup.id,
         })}>Vote for New Leader</Button> : null }
-        <AudioPlayer audioPlaylist={audioPlaylist} />
+        <AudioPlayer audioFiles={audioFiles} />
       </View>
     </SafeAreaView>
   );

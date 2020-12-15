@@ -14,6 +14,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { AuthContext } from '../navigation/AuthProvider';
 import { getAudioFiles, joinGroupSession } from '../firebase';
 
+
 function WelcomeScreen({ route, navigation }) {
   const { user, logout } = useContext(AuthContext);
   const [groupCode, setGroupCode] = useState(null);
@@ -26,8 +27,6 @@ function WelcomeScreen({ route, navigation }) {
       setLeaveSessionMessage(route.params.leaveMessage);
     }
   })
-
-  getAudioFiles();
 
   const storeFileData = async (value) => {
     try {

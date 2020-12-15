@@ -1,8 +1,10 @@
-// import * as FileSystem from 'expo-file-system';
+import * as FileSystem from 'expo-file-system';
 
-// const callback = downloadProgress => {
-//     const progress = downloadProgress.totalBytesWritten / downloadProgress.totalBytesExpectedToWrite;
-//     this.setState({
-//       downloadProgress: progress,
-//     });
-// };
+async function downloadAudioFiles(uri, fileName) {
+    const fileUri = FileSystem.documentDirectory + fileName;
+    const localFile = await FileSystem.downloadAsync(uri, fileUri)
+
+    return localFile.uri;
+};
+
+export default downloadAudioFiles;

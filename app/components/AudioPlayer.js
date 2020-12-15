@@ -28,10 +28,10 @@ function AudioPlayer(props) {
     }
     fetchData();
   }, []);
-
+  
   const loadAudio = async () => {
     try {
-      const source = { uri: props.audioPlaylist[currentIndex].uri };
+      const source = { uri: props.audioFiles[currentIndex].uri };
       const status = {
         shouldPlay: isPlaying,
         volume,
@@ -55,7 +55,7 @@ function AudioPlayer(props) {
     if (playbackInstance) {
       await playbackInstance.unloadAsync();
       currentIndex < 1
-        ? setCurrentIndex(props.audioPlaylist.length - 1)
+        ? setCurrentIndex(props.audioFiles.length - 1)
         : setCurrentIndex(currentIndex - 1);
       loadAudio();
     }
@@ -64,7 +64,7 @@ function AudioPlayer(props) {
   const handleNextTrack = async () => {
     if (playbackInstance) {
       await playbackInstance.unloadAsync();
-      currentIndex < props.audioPlaylist.length - 1
+      currentIndex < props.audioFiles.length - 1
         ? setCurrentIndex(currentIndex + 1)
         : setCurrentIndex(0);
     }
@@ -74,7 +74,7 @@ function AudioPlayer(props) {
     return playbackInstance ? (
       <View style={styles.trackInfo}>
         <Text style={[styles.trackInfoText, styles.largeText]}>
-          {props.audioPlaylist[currentIndex].title}
+          {props.audioFiles[currentIndex].title}
         </Text>
       </View>
     ) : null;
@@ -83,10 +83,6 @@ function AudioPlayer(props) {
   return (
     <>
       <View style={styles.container}>
-        <Image
-          style={styles.albumCover}
-          source={{ uri: props.audioPlaylist[currentIndex].imgSource }}
-        />
         <View style={styles.controls}>
           <TouchableOpacity
             style={styles.control}
