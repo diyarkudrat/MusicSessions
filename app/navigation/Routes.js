@@ -17,13 +17,12 @@ function Routes() {
 
   useEffect(() => {
     const subscriber = auth.onAuthStateChanged(onAuthStateChanged);
-    // console.log('Routes.js user', user);
     return subscriber;
   }, []);
 
   return (
     <NavigationContainer>
-      { user ? <HomeStack user={user} /> : <AuthStack /> }
+      { user ? <HomeStack  /> : <AuthStack /> }
     </NavigationContainer>
   );
 }

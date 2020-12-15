@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { SafeAreaView, View, StyleSheet, Text } from "react-native";
 import { Button } from "react-native-ios-kit";
 import AudioPlayer from "../components/AudioPlayer";
-import { endGroupSession, leaveGroupSession } from '../firebase';
+import { endGroupSession, leaveGroupSession, getLeaderValue, firestore } from '../firebase';
 
 
 const audioPlaylist = [
@@ -31,10 +31,28 @@ const audioPlaylist = [
 
 function GroupScreen({ route, navigation} ) {
   const { newGroup, user } = route.params;
+  const [leaderValue, setLeaderValue] = useState("");
+  const [sessionUsers, setSessionUsers] = useState([]);
+  
+  useEffect(() => {
+    async function fetchData() {
+      const groupRef = firestore.collection('Group Rooms');
+
+      groupRef.doc(newGroup.id).onSnapshot(doc => {
+        const { leader, users } = doc.data();
+        setLeaderValue(leader);
+        setSessionUsers(users);
+
+      })
+    }
+    fetchData();
+  }, []);
 
   const endSession = async () => {
-    await endGroupSession(newGroup.id);
     const endSessionMessage = `You have Ended ${newGroup.roomName}`;
+    
+    await endGroupSession(newGroup.id);
+
     navigation.navigate('Home', {
       endMessage: endSessionMessage,
       leaveMessage: null
@@ -42,13 +60,15 @@ function GroupScreen({ route, navigation} ) {
   };
 
   const leaveSession = async () => {
-    await leaveGroupSession(user.uid, newGroup.id);
     const leaveSessionMessage = `You have left ${newGroup.roomName}`;
+
+    await leaveGroupSession(user.uid, newGroup.id);
+
     navigation.navigate('Home', {
       leaveMessage: leaveSessionMessage,
       endMessage: null
-    })
-  }
+    });
+  };
 
   return (
     <SafeAreaView>
@@ -61,6 +81,10 @@ function GroupScreen({ route, navigation} ) {
       <View style={styles.musicContainer}>
         <Text style={styles.text}>Group Code : {newGroup.code}</Text>
         <Text style={styles.text}>Group Leader : {user.email}</Text>
+        { leaderValue === null ? <Button inline inverted  onPress={() => navigation.navigate('VoteNewLeader', {
+          users: sessionUsers,
+          roomId: newGroup.id,
+        })}>Vote for New Leader</Button> : null }
         <AudioPlayer audioPlaylist={audioPlaylist} />
       </View>
     </SafeAreaView>

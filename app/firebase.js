@@ -46,6 +46,14 @@ const getGroupSession = async (id) => {
   return data;
 };
 
+export const getLeaderValue = async (id) => {
+  const groupRef = firestore.collection('Group Rooms');
+  const snapshot = await groupRef.doc(id).get();
+  const { leader } = snapshot.data();
+
+  return leader;
+};
+
 export const joinGroupSession = async (groupCode, userId) => {
   const groupRef = firestore.collection('Group Rooms');
   const querySnapshot = await groupRef.where('code', '==', parseInt(groupCode)).get();
@@ -53,7 +61,6 @@ export const joinGroupSession = async (groupCode, userId) => {
   roomRef.ref.update({
     users: firebase.firestore.FieldValue.arrayUnion(userId)
   })
-  const roomData = roomRef.data();
   const roomId = roomRef.id;
 
   const { code, leader, roomName, users } = roomRef.data();
@@ -69,17 +76,18 @@ export const endGroupSession = async (id) => {
 };
 
 export const leaveGroupSession = async (userId, roomId) => {
-  const groupRef = firestore.collection('Group Rooms');
-  const roomRef = await groupRef.doc(roomId).get();
-  roomRef.ref.update({
-    users: firebase.firestore.FieldValue.arrayRemove(userId)
-  });
-
   try {
-    const docRef = groupRef
+    const groupRef = firestore.collection('Group Rooms');
+    const roomRef = await groupRef.doc(roomId).get();
+  
+    roomRef.ref.update({
+      users: firebase.firestore.FieldValue.arrayRemove(userId)
+    });
+
+    groupRef
       .doc(roomId)
       .onSnapshot(doc => {
-        if (doc.data()) {
+        if (doc.data().users.length === 0) {
           docRef();
           endGroupSession(roomId);
         } else {
@@ -87,16 +95,48 @@ export const leaveGroupSession = async (userId, roomId) => {
           const sessionLeader = doc.data().leader;
         
           if (!sessionUsers.includes(sessionLeader)) {
-            electNewLeader(sessionUsers, sessionLeader, roomRef);
+            roomRef.ref.update({ leader: null });
+
+            setElectLeader(sessionUsers, roomRef);
           }
         }
       })
   } catch (err) {
     console.log(err);
   }
-}
+};
 
-const electNewLeader = (users, leader, roomRef) => {
+export const updateNewLeader = async (roomId) => {
+  const groupRef = firestore.collection('Group Rooms');
+  const roomRef = await groupRef.doc(roomId).get();
+  
+  try {
+    const docRef = groupRef.doc(roomId).onSnapshot(doc => {
+      if (doc.data().leader === null) {     
+        const newLeader = getNewLeader(doc.data().electLeader);
+    
+        roomRef.ref.update({ leader: newLeader[0] });
+        docRef();
+        return newLeader;
+      }
+      return doc.data().leader;
+    });
+  } catch (err) {
+    console.log('updateNewLeader() error', err);
+  }
+};
+
+const getNewLeader = object => {
+  const newLeader = Object.keys(object).filter(x => {
+    return object[x] == Math.max.apply(null,
+      Object.values(object));
+  });
+
+  return newLeader[0];
+};
+  
+
+const setElectLeader = (users, roomRef) => {
   let electLeaderUsers = {};
 
   users.forEach(user => {
@@ -104,7 +144,29 @@ const electNewLeader = (users, leader, roomRef) => {
   });
 
   roomRef.ref.update({
-    electLeader: electLeaderUsers
+    electLeader: electLeaderUsers,
+    waitingUsers: []
+  });
+};
+
+export const updateElectNewLeader = async (user, roomId) => {
+  const groupRef = firestore.collection('Group Rooms');
+  const roomRef = await groupRef.doc(roomId).get();
+  const votedLeader = `electLeader.${user}`;
+
+  roomRef.ref.update({
+    [votedLeader]: firebase.firestore.FieldValue.increment(1)
+  });
+};
+
+export const updateWaitingUsers = async (roomId, userId) => {
+  const groupRef = firestore.collection('Group Rooms');
+  const roomRef = await groupRef.doc(roomId).get();
+
+  console.log("USER ID", userId);
+
+  roomRef.ref.update({
+    waitingUsers: firebase.firestore.FieldValue.arrayUnion(userId)
   });
 };
 
