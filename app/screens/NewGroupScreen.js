@@ -22,8 +22,8 @@ function NewGroupScreen({ route, navigation }) {
         newGroup: newGroup,
         user: user
       });
-    }
-  }
+    };
+  };
 
   return (
     <View style={styles.container}>

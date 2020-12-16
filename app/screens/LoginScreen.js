@@ -4,8 +4,6 @@ import {
   StyleSheet,
   Text,
   TextInput,
-  TouchableWithoutFeedback,
-  Keyboard,
 } from "react-native";
 import { Button } from "react-native-ios-kit";
 import { AuthContext } from '../navigation/AuthProvider';

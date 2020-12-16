@@ -4,9 +4,6 @@ import {
   StyleSheet,
   Text,
   TextInput,
-  TouchableWithoutFeedback,
-  Keyboard,
-  SafeAreaView,
 } from "react-native";
 import { Button } from "react-native-ios-kit";
 import { IconButton } from "react-native-paper";

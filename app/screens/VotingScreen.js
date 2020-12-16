@@ -32,7 +32,7 @@ function VotingScreen({ route, navigation }) {
           <CheckBox center title={user.user} key={user.user} checked={user.checked} onPress={() => handleOnPress(user)} />
           
         )
-    }
+    };
 
     const handleOnPress = async (clickedUser) => {
         const updatedUsers = users.map(user => {
@@ -46,16 +46,13 @@ function VotingScreen({ route, navigation }) {
         await updateElectNewLeader(clickedUser.user, route.params.roomId);
         setUsers(updatedUsers);
 
-        // navigation.navigate('Wait', {
-        //     roomId: route.params.roomId,
-        //     user: route.params.user
-        // });
-    }
+        navigation.navigate('GroupSession');
+    };
     
     return (
         <SafeAreaView style={styles.container}>
             <View>
-                { isWaiting ? <Text>Waiting...</Text> : users ? showUsers() : null }
+                { isWaiting ? <Text style={styles.text}>Waiting...</Text> : users ? showUsers() : null }
             </View>
         </SafeAreaView>
     );
@@ -67,7 +64,13 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         backgroundColor: '#2D3F4D'
+    },
+    text: {
+        color: "white",
+        fontSize: 36,
+        fontWeight: "600",
+        bottom: 20,
     }
-})
+});
 
 export default VotingScreen;

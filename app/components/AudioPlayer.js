@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import React from "react";
 import { TouchableOpacity, View, Image, StyleSheet, Text } from "react-native";
 import { Ionicons, AntDesign } from "@expo/vector-icons";
 import { Audio } from "expo-av";
@@ -11,7 +11,7 @@ export default class App extends React.Component {
     currentIndex: 0,
     volume: 1.0,
     isBuffering: false,
-    currSong: this.randomSong(this.props.audioFiles),
+    currSong: this.getFirstSong(this.props.audioFiles),
     songIdArray: this.getIdKeys(this.props.audioFiles),
   }
 
@@ -44,13 +44,13 @@ export default class App extends React.Component {
     }
   }
 
-  randomSong(obj) {
+  getFirstSong(obj) {
     return Object.keys(obj)[0];
   };
   
   getIdKeys(obj) {
     return Object.keys(obj);
-  }
+  };
 
   async updateIsPlaying(songId, isPlaying) {
     const roomId = this.props.roomId;
@@ -65,31 +65,29 @@ export default class App extends React.Component {
     const { isPlaying, volume, currSong } = this.state
    
     try {
-      const playbackInstance = new Audio.Sound()
+      const playbackInstance = new Audio.Sound();
       const song = this.props.audioFiles[currSong];
-
       const source = {
         uri: song.uri
-      }
-   
+      };
       const status = {
         shouldPlay: isPlaying,
         volume
-      }
+      };
    
-      playbackInstance.setOnPlaybackStatusUpdate(this.onPlaybackStatusUpdate)     
-      await playbackInstance.loadAsync(source, status, false)
-      this.setState({playbackInstance})
+      playbackInstance.setOnPlaybackStatusUpdate(this.onPlaybackStatusUpdate);    
+      await playbackInstance.loadAsync(source, status, false);
+      this.setState({playbackInstance});
     } catch (e) {
         console.log(e)
-    }
-  }
+    };
+  };
 
   onPlaybackStatusUpdate = status => {
     this.setState({
       isBuffering: status.isBuffering
-    })
-  }
+    });
+  };
 
   handlePlayPause = async () => {
     const { isPlaying, playbackInstance, currSong } = this.state
@@ -105,44 +103,44 @@ export default class App extends React.Component {
     this.setState({
       isPlaying: !isPlaying
     })
-  }
+  };
 
   handlePreviousTrack = async () => {
-    let { playbackInstance, currentIndex, songIdArray } = this.state
+    let { playbackInstance, currentIndex, songIdArray } = this.state;
     if (playbackInstance) {
       await playbackInstance.unloadAsync();
       await this.updateIsPlaying(songIdArray[currentIndex], false);
       currentIndex < 1
-        ? currentIndex = this.state.songIdArray.length - 1
-        : currentIndex -= 1;
+      ? currentIndex = songIdArray.length - 1
+      : currentIndex -= 1;
       this.setState({
         currentIndex
-      })
+      });
       await this.updateIsPlaying(songIdArray[currentIndex], true);
-      this.loadAudio()
-    }
-  }
-
+      this.loadAudio();
+    };
+  };
+  
   handleNextTrack = async () => {
-    let { playbackInstance, currentIndex, songIdArray } = this.state
+    let { playbackInstance, currentIndex, songIdArray } = this.state;
+    
     if (playbackInstance) {
-      await playbackInstance.unloadAsync()
-      await this.updateIsPlaying(songIdArray[currentIndex], false);
-      console.log('CURRENT CurrIndex', currentIndex);
-      currentIndex < this.state.songIdArray.length
-        ? currentIndex = currentIndex + 1
-        : currentIndex = 0;
+      await playbackInstance.unloadAsync();
+      await this.updateIsPlaying(currSong, false);
+      currentIndex < songIdArray.length - 1
+      ? currentIndex = currentIndex + 1
+      : currentIndex = 0;
       this.setState({
         currentIndex
-      })
-      console.log('AFTER currIndex', currentIndex);
+      });
       await this.updateIsPlaying(songIdArray[currentIndex], true);
-      this.loadAudio()
-    }
-  }
+      this.loadAudio();
+    };
+  };
 
   renderFileInfo() {
-    const { playbackInstance, currSong } = this.state
+    const { playbackInstance, currSong } = this.state;
+
     return playbackInstance ? (
       <View style={styles.trackInfo}>
         <Text style={[styles.trackInfoText, styles.largeText]}>
@@ -150,10 +148,9 @@ export default class App extends React.Component {
         </Text>
       </View>
     ) : null
-  }
+  };
 
   render() {
-    console.log('SONG ID ARRAY',this.state.songIdArray);
     return (
       <View style={styles.container}>
         <Image

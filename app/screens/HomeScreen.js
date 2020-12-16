@@ -32,8 +32,8 @@ function WelcomeScreen({ route, navigation }) {
     navigation.navigate('GroupSession', {
       newGroup: groupSession,
       user: user
-    })
-  }
+    });
+  };
 
   return (
     <SafeAreaView style={styles.container}>
