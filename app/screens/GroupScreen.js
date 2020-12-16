@@ -67,7 +67,7 @@ function GroupScreen({ route, navigation} ) {
   return (
     <SafeAreaView>
       <View style={styles.buttonContainer}>
-        { newGroup.leader === user.uid ? <Button inline inverted style={styles.button} onPress={endSession}>End Session</Button> : null }
+        { leaderValue === user.uid ? <Button inline inverted style={styles.button} onPress={endSession}>End Session</Button> : null }
         <Button inline inverted style={styles.button} onPress={leaveSession}>
           Leave
         </Button>

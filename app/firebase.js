@@ -32,7 +32,8 @@ export const createNewGroup = async (name, user) => {
     code: groupCode,
     leader: user.uid,
     users: [user.uid],
-    currentSong: {}
+    currentSong: {},
+    leaderVotes: []
   });
   const { id } = newRoom;
   const { code, leader, roomName } = await getGroupSession(id);
@@ -107,8 +108,6 @@ export const leaveGroupSession = async (userId, roomId) => {
           // if session leader left, update document Leader field to null
           if (!sessionUsers.includes(sessionLeader)) {
             roomRef.ref.update({ leader: null });
-
-            setElectLeader(sessionUsers, roomRef);
           };
         };
       });
@@ -147,31 +146,47 @@ const getNewLeader = object => {
 
   return newLeader[0];
 };
-  
-// set the object that keeps track of vote count in document
-const setElectLeader = (users, roomRef) => {
-  let electLeaderUsers = {};
-
-  users.forEach(user => {
-    electLeaderUsers[user] = 0;
-  });
-
-  roomRef.ref.update({
-    electLeader: electLeaderUsers,
-    waitingUsers: []
-  });
-};
 
 // Increase the vote count for the passed in user
-export const updateElectNewLeader = async (user, roomId) => {
+export const updateLeaderVotes = async (user, roomId) => {
   const groupRef = firestore.collection('Group Rooms');
   const roomRef = await groupRef.doc(roomId).get();
-  const votedLeader = `electLeader.${user}`;
 
   roomRef.ref.update({
-    [votedLeader]: firebase.firestore.FieldValue.increment(1)
+    leaderVotes: firebase.firestore.FieldValue.arrayUnion(user)
   });
 };
+
+export const setNewLeader = async (roomId) => {
+  const groupRef = firestore.collection('Group Rooms');
+  const roomRef = await groupRef.doc(roomId).get();
+  const { leaderVotes } = roomRef.data();
+  const newLeader = mostFreq(leaderVotes);
+
+  roomRef.ref.update({
+    leader: newLeader
+  });
+};
+
+function mostFreq(arr) {
+  var obj = {}, mostFreq = 0, result = [];
+
+  arr.forEach(ea => {
+    if (!obj[ea]) {
+      obj[ea] = 1;
+    } else {
+      obj[ea]++;
+    }
+
+    if (obj[ea] > mostFreq) {
+      mostFreq = obj[ea];
+      result = [ea];
+    } else if (obj[ea] === mostFreq) {
+      result.push(ea);
+    }
+  });
+  return result[0];
+}
 
 // update the array of users who have voted already
 export const updateWaitingUsers = async (roomId, userId) => {

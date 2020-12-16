@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { SafeAreaView, StyleSheet, Text, View } from 'react-native';
 import { CheckBox } from 'react-native-elements';
-import { updateElectNewLeader } from '../firebase';
+import { updateLeaderVotes, setNewLeader } from '../firebase';
 
 function VotingScreen({ route, navigation }) {
     const [users, setUsers] = useState([]);
@@ -43,10 +43,13 @@ function VotingScreen({ route, navigation }) {
             return user;
         });
 
-        await updateElectNewLeader(clickedUser.user, route.params.roomId);
         setUsers(updatedUsers);
-
-        navigation.navigate('GroupSession');
+        updateLeaderVotes(clickedUser.user, route.params.roomId);
+        
+        setTimeout(() => {
+            setNewLeader(route.params.roomId);
+            navigation.navigate('GroupSession');
+        }, 5000);
     };
     
     return (
