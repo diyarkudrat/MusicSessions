@@ -12,6 +12,7 @@ export default class App extends React.Component {
     volume: 1.0,
     isBuffering: false,
     currSong: this.randomSong(this.props.audioFiles),
+    songIdArray: this.getIdKeys(this.props.audioFiles),
   }
 
   async componentDidMount() {
@@ -45,7 +46,11 @@ export default class App extends React.Component {
 
   randomSong(obj) {
     return Object.keys(obj)[0];
-  };  
+  };
+  
+  getIdKeys(obj) {
+    return Object.keys(obj);
+  }
 
   async updateIsPlaying(songId, isPlaying) {
     const roomId = this.props.roomId;
@@ -103,33 +108,35 @@ export default class App extends React.Component {
   }
 
   handlePreviousTrack = async () => {
-    let { playbackInstance, currentIndex } = this.state
+    let { playbackInstance, currentIndex, songIdArray } = this.state
     if (playbackInstance) {
       await playbackInstance.unloadAsync();
-      // await this.updateIsPlaying(this.props.audioFiles[currentIndex].id, false);
+      await this.updateIsPlaying(songIdArray[currentIndex], false);
       currentIndex < 1
-        ? currentIndex = this.props.audioFiles.length - 1
+        ? currentIndex = this.state.songIdArray.length - 1
         : currentIndex -= 1;
       this.setState({
         currentIndex
       })
-      // await this.updateIsPlaying(this.props.audioFiles[currentIndex].id, true);
+      await this.updateIsPlaying(songIdArray[currentIndex], true);
       this.loadAudio()
     }
   }
 
   handleNextTrack = async () => {
-    let { playbackInstance, currentIndex } = this.state
+    let { playbackInstance, currentIndex, songIdArray } = this.state
     if (playbackInstance) {
       await playbackInstance.unloadAsync()
-      // await this.updateIsPlaying(this.props.audioFiles[currentIndex].id, false);
-      currentIndex < this.props.audioFiles.length - 1
+      await this.updateIsPlaying(songIdArray[currentIndex], false);
+      console.log('CURRENT CurrIndex', currentIndex);
+      currentIndex < this.state.songIdArray.length
         ? currentIndex = currentIndex + 1
         : currentIndex = 0;
       this.setState({
         currentIndex
       })
-      // await this.updateIsPlaying(this.props.audioFiles[currentIndex].id, true);
+      console.log('AFTER currIndex', currentIndex);
+      await this.updateIsPlaying(songIdArray[currentIndex], true);
       this.loadAudio()
     }
   }
@@ -146,6 +153,7 @@ export default class App extends React.Component {
   }
 
   render() {
+    console.log('SONG ID ARRAY',this.state.songIdArray);
     return (
       <View style={styles.container}>
         <Image

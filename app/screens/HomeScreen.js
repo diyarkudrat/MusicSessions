@@ -6,8 +6,7 @@ import {
   SafeAreaView,
   Image,
   TextInput,
-  TouchableWithoutFeedback,
-  Keyboard,
+  Alert,
 } from "react-native";
 import { Button } from "react-native-ios-kit";
 import { AuthContext } from '../navigation/AuthProvider';
@@ -21,10 +20,10 @@ function WelcomeScreen({ route, navigation }) {
   const [leaveSessionMessage, setLeaveSessionMessage] = useState("");
 
   useEffect(() => {
-    // if (route.params) {
-    //   setEndSessionMessage(route.params.endMessage);
-    //   setLeaveSessionMessage(route.params.leaveMessage);
-    // }
+    if (route.params) {
+      setEndSessionMessage(route.params.endMessage);
+      setLeaveSessionMessage(route.params.leaveMessage);
+    }
   })
 
   const joinSession = async () => {
@@ -38,8 +37,8 @@ function WelcomeScreen({ route, navigation }) {
 
   return (
     <SafeAreaView style={styles.container}>
-      { endSessionMessage ? alert(endSessionMessage) : null }
-      { leaveSessionMessage ? alert(leaveSessionMessage) : null }
+      { endSessionMessage ? Alert.alert(endSessionMessage) : null }
+      { leaveSessionMessage ? Alert.alert(leaveSessionMessage) : null }
       <View style={styles.logoContainer}>
         <Text style={styles.title}>MusicSessions</Text>
         <Image style={styles.logo} source={require("../assets/vinyl.png")} />

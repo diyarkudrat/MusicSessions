@@ -17,9 +17,11 @@ function GroupScreen({ route, navigation} ) {
       const groupRef = firestore.collection('Group Rooms');
 
       groupRef.doc(newGroup.id).onSnapshot(doc => {
-        const { leader, users } = doc.data();
-        setLeaderValue(leader);
-        setSessionUsers(users);
+        if (doc.data()) {
+          const { leader, users } = doc.data();
+          setLeaderValue(leader);
+          setSessionUsers(users);
+        }
       })
 
       const files = await getAudioFiles(newGroup.id);
@@ -43,14 +45,18 @@ function GroupScreen({ route, navigation} ) {
   };
 
   const leaveSession = async () => {
-    const leaveSessionMessage = `You have left ${newGroup.roomName}`;
-
-    await leaveGroupSession(user.uid, newGroup.id);
-
-    navigation.navigate('Home', {
-      leaveMessage: leaveSessionMessage,
-      endMessage: null
-    });
+    try {
+      const leaveSessionMessage = `You have left ${newGroup.roomName}`;
+  
+      await leaveGroupSession(user.uid, newGroup.id);
+  
+      navigation.navigate('Home', {
+        leaveMessage: leaveSessionMessage,
+        endMessage: null
+      });
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   return (
@@ -62,8 +68,9 @@ function GroupScreen({ route, navigation} ) {
         </Button>
       </View>
       <View style={styles.musicContainer}>
+        <Text style={styles.text}>Group Name : {newGroup.roomName}</Text>
         <Text style={styles.text}>Group Code : {newGroup.code}</Text>
-        <Text style={styles.text}>Group Leader : {user.email}</Text>
+        <Text style={styles.text}>Group Leader : {newGroup.id}</Text>
         { leaderValue === null ? <Button inline inverted  onPress={() => navigation.navigate('VoteNewLeader', {
           users: sessionUsers,
           roomId: newGroup.id,
