@@ -5,12 +5,13 @@ import "firebase/storage";
 import downloadAudioFiles from './fileSystem';
 
 const firebaseConfig = {
-  apiKey: "AIzaSyBt1qWYaLiOjfQlEQOFFeew2DRbE4ChZcw",
-  authDomain: "music-sesssions-rn.firebaseapp.com",
-  projectId: "music-sesssions-rn",
-  storageBucket: "music-sesssions-rn.appspot.com",
-  messagingSenderId: "103972053125",
-  appId: "1:103972053125:web:2b77a96936ce57fa0409ec"
+  apiKey: "AIzaSyDJ1K_u9lRRtkP6pzbZzN2-0mFWesMaTb8",
+  authDomain: "music-sessions-rn.firebaseapp.com",
+  projectId: "music-sessions-rn",
+  storageBucket: "music-sessions-rn.appspot.com",
+  messagingSenderId: "190063416356",
+  appId: "1:190063416356:web:02d235d69d0aaf309974b1",
+  measurementId: "G-HEXX8KJPBF"
 };
 // Initialize Firebase
 if (!firebase.apps.length) {

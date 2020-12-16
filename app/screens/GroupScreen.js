@@ -9,6 +9,7 @@ function GroupScreen({ route, navigation} ) {
   const [leaderValue, setLeaderValue] = useState("");
   const [sessionUsers, setSessionUsers] = useState([]);
   const [audioFiles, setAudioFiles] = useState();
+  const [isLeader, setIsLeader] = useState(false);
   
   useEffect(() => {
     let isCancelled = true;
@@ -21,6 +22,10 @@ function GroupScreen({ route, navigation} ) {
           const { leader, users } = doc.data();
           setLeaderValue(leader);
           setSessionUsers(users);
+
+          if (leader === user.userId) {
+            setIsLeader(true);
+          }
         }
       })
 
@@ -75,7 +80,7 @@ function GroupScreen({ route, navigation} ) {
           users: sessionUsers,
           roomId: newGroup.id,
         })}>Vote for New Leader</Button> : null }
-        { audioFiles ? <AudioPlayer audioFiles={audioFiles} roomId={newGroup.id} /> : null }
+        { audioFiles ? <AudioPlayer audioFiles={audioFiles} roomId={newGroup.id} isLeader={isLeader} /> : null }
       </View>
     </SafeAreaView>
   );

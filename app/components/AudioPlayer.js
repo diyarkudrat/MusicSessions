@@ -163,24 +163,26 @@ export default class App extends React.Component {
           style={styles.albumCover}
           source={require('../assets/vinyl.png')}
         />
-        <View style={styles.controls}>
-          <TouchableOpacity
-            style={styles.control}
-            onPress={this.handlePreviousTrack}
-          >
-            <AntDesign name="stepbackward" size={45} color="#444" />
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.control} onPress={this.handlePlayPause}>
-            {this.state.isPlaying ? (
-              <Ionicons name="ios-pause" size={48} color="#444" />
-            ) : (
-              <Ionicons name="ios-play-circle" size={48} color="#444" />
-            )}
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.control} onPress={this.handleNextTrack}>
-            <AntDesign name="stepforward" size={45} color="#444" />
-          </TouchableOpacity>
-        </View>
+        { this.props.isLeader ? 
+          <View style={styles.controls}>
+            <TouchableOpacity
+              style={styles.control}
+              onPress={this.handlePreviousTrack}
+            >
+              <AntDesign name="stepbackward" size={45} color="#444" />
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.control} onPress={this.handlePlayPause}>
+              {this.state.isPlaying ? (
+                <Ionicons name="ios-pause" size={48} color="#444" />
+              ) : (
+                <Ionicons name="ios-play-circle" size={48} color="#444" />
+              )}
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.control} onPress={this.handleNextTrack}>
+              <AntDesign name="stepforward" size={45} color="#444" />
+            </TouchableOpacity>
+          </View> : null 
+          }
         {this.renderFileInfo()}
       </View>
     )
