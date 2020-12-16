@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import React from "react";
 import { TouchableOpacity, View, Image, StyleSheet, Text } from "react-native";
 import { Ionicons, AntDesign } from "@expo/vector-icons";
 import { Audio } from "expo-av";
@@ -15,17 +15,31 @@ export default class App extends React.Component {
     songIdArray: this.getIdKeys(this.props.audioFiles),
   }
 
+  handlePlayPauseLocal = async () => {
+    const { isPlaying, playbackInstance } = this.state
+
+    if (isPlaying === true) {
+      await playbackInstance.pauseAsync();
+    } else {
+      await playbackInstance.playAsync();
+    }
+ 
+    this.setState({
+      isPlaying: !isPlaying
+    });
+  }
+
   async componentDidMount() {
     firestore.collection('Group Rooms')
       .doc(this.props.roomId)
-      .collection('Songs')
-      .onSnapshot(docs => {
-        docs.forEach(doc => {
-          if (doc.data().isPlaying === true) {
-            this.setState({ currSong: doc.id });
-          }
-        })
-      })
+      .onSnapshot(doc => {
+        if (doc.data().currentSong.isPlaying !== this.state.isPlaying) {
+          this.handlePlayPauseLocal();
+        } else if (doc.data().currentSong.songId !== this.state.currSong) {
+          this.setState({ currSong : doc.data().currentSong.songId});
+          this.loadAudio();
+        }
+      });
 
     try {
       await Audio.setAudioModeAsync({
@@ -51,15 +65,6 @@ export default class App extends React.Component {
   getIdKeys(obj) {
     return Object.keys(obj);
   }
-
-  async updateIsPlaying(songId, isPlaying) {
-    const roomId = this.props.roomId;
-    const songsRef = firestore.collection('Group Rooms').doc(roomId).collection('Songs');
-
-    songsRef.doc(songId).update({
-      isPlaying: isPlaying
-    })
-  };
 
   async loadAudio() {
     const { isPlaying, volume, currSong } = this.state
@@ -91,14 +96,32 @@ export default class App extends React.Component {
     })
   }
 
+  async updateIsPlaying() {
+    const roomId = this.props.roomId;
+    const roomRef = firestore.collection('Group Rooms').doc(roomId);
+    const data = await roomRef.get()
+    const currentSong = data.data().currentSong;
+
+    roomRef.update({
+      currentSong: {
+        ...currentSong,
+        isPlaying: !currentSong.isPlaying
+      }
+    });
+
+    this.setState({
+      isPlaying: false
+    });
+  };
+
   handlePlayPause = async () => {
-    const { isPlaying, playbackInstance, currSong } = this.state
+    const { isPlaying, playbackInstance } = this.state
 
     if (isPlaying === true) {
-      await this.updateIsPlaying(currSong, false);
+      await this.updateIsPlaying();
       await playbackInstance.pauseAsync();
     } else {
-      await this.updateIsPlaying(currSong, true);
+      await this.updateIsPlaying();
       await playbackInstance.playAsync();
     }
  
@@ -107,40 +130,61 @@ export default class App extends React.Component {
     })
   }
 
+  async updateCurrentSong(newSongId) {
+    const { title } = this.props.audioFiles[newSongId];
+    const roomId = this.props.roomId;
+    const roomRef = firestore.collection('Group Rooms').doc(roomId);
+
+    roomRef.update({
+      currentSong: {
+        isPlaying: true,
+        name: title,
+        songId: newSongId
+      }
+    })
+
+    this.setState({
+      isPlaying: true
+    });
+  }
+
   handlePreviousTrack = async () => {
-    let { playbackInstance, currentIndex, songIdArray } = this.state
+    let { playbackInstance, currentIndex, songIdArray } = this.state;
+
     if (playbackInstance) {
       await playbackInstance.unloadAsync();
-      await this.updateIsPlaying(songIdArray[currentIndex], false);
+      await this.updateIsPlaying();
+
       currentIndex < 1
       ? currentIndex = songIdArray.length - 1
       : currentIndex -= 1;
+
+      this.updateCurrentSong(songIdArray[currentIndex]);
+      this.loadAudio();
+
       this.setState({
         currentIndex
-      })
-      await this.updateIsPlaying(songIdArray[currentIndex], true);
-      this.loadAudio()
+      });
     }
   }
   
   handleNextTrack = async () => {
-    let { playbackInstance, currentIndex, songIdArray, currSong } = this.state;
-    
+    let { playbackInstance, currentIndex, songIdArray } = this.state;
+
     if (playbackInstance) {
       await playbackInstance.unloadAsync();
-      await this.updateIsPlaying(currSong, false);
+      await this.updateIsPlaying();
 
       currentIndex < songIdArray.length - 1
       ? currentIndex = currentIndex + 1
       : currentIndex = 0;
 
-      this.setState({
-        currentIndex,
-        currSong: this.state.songIdArray[currentIndex]
-      })
+      this.updateCurrentSong(songIdArray[currentIndex]);
+      this.loadAudio();
 
-      await this.updateIsPlaying(songIdArray[currentIndex], true);
-      this.loadAudio()
+      this.setState({
+        currentIndex
+      });
     }
   }
 
@@ -163,7 +207,7 @@ export default class App extends React.Component {
           style={styles.albumCover}
           source={require('../assets/vinyl.png')}
         />
-        { this.props.isLeader ? 
+        { this.props.isLeader ?
           <View style={styles.controls}>
             <TouchableOpacity
               style={styles.control}
@@ -181,8 +225,8 @@ export default class App extends React.Component {
             <TouchableOpacity style={styles.control} onPress={this.handleNextTrack}>
               <AntDesign name="stepforward" size={45} color="#444" />
             </TouchableOpacity>
-          </View> : null 
-          }
+          </View> : null
+        }
         {this.renderFileInfo()}
       </View>
     )

@@ -31,7 +31,8 @@ export const createNewGroup = async (name, user) => {
     roomName: name,
     code: groupCode,
     leader: user.uid,
-    users: [user.uid]
+    users: [user.uid],
+    currentSong: {}
   });
   const { id } = newRoom;
   const { code, leader, roomName } = await getGroupSession(id);
@@ -229,30 +230,31 @@ const getUserDocument = async (uid) => {
 
 export const getAudioFiles = async (roomId) => {
   const songsRef = firestore.collection('Songs');
-  const roomRef = firestore.collection('Group Rooms').doc(roomId).collection('Songs');
+  const roomRef = firestore.collection('Group Rooms').doc(roomId);
   const docRef = await songsRef.get();
   const docs = docRef.docs;
+
   const playlist = {};
+  
+  const { fileName } = docs[0].data();
+  const songId = docs[0].id;
+  
+  roomRef.update({
+    currentSong: {
+      name: fileName,
+      isPlaying: false,
+      songId: songId
+    }
+  });
 
   // For each document in the Songs Collection
   for (const i in docs) {
     let id;
     const { fileName, url } = docs[i].data();
-    const isCollection = await roomRef.get();
     // Download audio files locally to device
     const uri = await downloadAudioFiles(url, fileName);
-
-    // If there isn't a Songs subcollection within the Session document
-    // or there's already songs in the subcollection
-    if (!isCollection.docs || isCollection.docs.length != MAX_SONGS) {
-      const newSongDoc = await roomRef.add({
-        fileName,
-        isPlaying: false,
-      });
-      id = newSongDoc.id;
-    } else {
-      id = (await roomRef.get()).docs[i].id
-    }
+    
+    id = (await songsRef.get()).docs[i].id
 
     playlist[id] = { title: fileName, uri: uri };
   }
