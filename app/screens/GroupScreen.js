@@ -23,9 +23,8 @@ function GroupScreen({ route, navigation} ) {
       })
 
       const files = await getAudioFiles(newGroup.id);
-      console.log('FILES', files);
+
       setAudioFiles(files);
-      
     }
     fetchData();
     return () => { isCancelled = false };

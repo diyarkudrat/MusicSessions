@@ -164,8 +164,6 @@ export const updateWaitingUsers = async (roomId, userId) => {
   const groupRef = firestore.collection('Group Rooms');
   const roomRef = await groupRef.doc(roomId).get();
 
-  console.log("USER ID", userId);
-
   roomRef.ref.update({
     waitingUsers: firebase.firestore.FieldValue.arrayUnion(userId)
   });
@@ -218,7 +216,7 @@ export const getAudioFiles = async (roomId) => {
   const roomRef = firestore.collection('Group Rooms').doc(roomId).collection('Songs');
   const docRef = await songsRef.get();
   const docs = docRef.docs;
-  const playlist = [];
+  const playlist = {};
 
   for (const i in docs) {
     let id;
@@ -226,16 +224,17 @@ export const getAudioFiles = async (roomId) => {
     const isCollection = await roomRef.get();
     const uri = await downloadAudioFiles(url, fileName);
 
-    if (isCollection.docs.length != MAX_SONGS) {
+    if (!isCollection.docs || isCollection.docs.length != MAX_SONGS) {
       const newSongDoc = await roomRef.add({
         fileName,
         isPlaying: false,
       });
-      id = newSongDoc;
-    };
+      id = newSongDoc.id;
+    } else {
+      id = (await roomRef.get()).docs[i].id
+    }
 
-
-    playlist.push({ title: fileName, uri: uri, id: id });
+    playlist[id] = { title: fileName, uri: uri };
   }
 
   return playlist;

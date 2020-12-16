@@ -10,10 +10,22 @@ export default class App extends React.Component {
     playbackInstance: null,
     currentIndex: 0,
     volume: 1.0,
-    isBuffering: false
+    isBuffering: false,
+    currSong: this.randomSong(this.props.audioFiles),
   }
 
   async componentDidMount() {
+    firestore.collection('Group Rooms')
+      .doc(this.props.roomId)
+      .collection('Songs')
+      .onSnapshot(docs => {
+        docs.forEach(doc => {
+          if (doc.data().isPlaying === true) {
+            this.setState({ currSong: doc.id });
+          }
+        })
+      })
+
     try {
       await Audio.setAudioModeAsync({
         allowsRecordingIOS: false,
@@ -24,32 +36,35 @@ export default class App extends React.Component {
         staysActiveInBackground: true,
         playThroughEarpieceAndroid: true
       })
- 
+
       this.loadAudio()
     } catch (e) {
       console.log(e)
     }
   }
 
-  // componentDidUpdate() {
-    
-  // }
+  randomSong(obj) {
+    return Object.keys(obj)[0];
+  };  
 
   async updateIsPlaying(songId, isPlaying) {
     const roomId = this.props.roomId;
     const songsRef = firestore.collection('Group Rooms').doc(roomId).collection('Songs');
+
     songsRef.doc(songId).update({
       isPlaying: isPlaying
     })
   };
 
   async loadAudio() {
-    const {currentIndex, isPlaying, volume} = this.state
+    const { isPlaying, volume, currSong } = this.state
    
     try {
       const playbackInstance = new Audio.Sound()
+      const song = this.props.audioFiles[currSong];
+
       const source = {
-        uri: this.props.audioFiles[currentIndex].uri
+        uri: song.uri
       }
    
       const status = {
@@ -72,14 +87,19 @@ export default class App extends React.Component {
   }
 
   handlePlayPause = async () => {
-    const { isPlaying, playbackInstance } = this.state
-    isPlaying ? await playbackInstance.pauseAsync() : await playbackInstance.playAsync()
+    const { isPlaying, playbackInstance, currSong } = this.state
+
+    if (isPlaying === true) {
+      await this.updateIsPlaying(currSong, false);
+      await playbackInstance.pauseAsync();
+    } else {
+      await this.updateIsPlaying(currSong, true);
+      await playbackInstance.playAsync();
+    }
  
     this.setState({
       isPlaying: !isPlaying
     })
-
-    // await this.updateIsPlaying()
   }
 
   handlePreviousTrack = async () => {
@@ -115,17 +135,11 @@ export default class App extends React.Component {
   }
 
   renderFileInfo() {
-    const { playbackInstance, currentIndex } = this.state
+    const { playbackInstance, currSong } = this.state
     return playbackInstance ? (
       <View style={styles.trackInfo}>
         <Text style={[styles.trackInfoText, styles.largeText]}>
-          {this.props.audioFiles[currentIndex].title}
-        </Text>
-        <Text style={[styles.trackInfoText, styles.smallText]}>
-          {this.props.audioFiles[currentIndex].author}
-        </Text>
-        <Text style={[styles.trackInfoText, styles.smallText]}>
-          {this.props.audioFiles[currentIndex].source}
+          {this.props.audioFiles[currSong].title}
         </Text>
       </View>
     ) : null
@@ -188,136 +202,3 @@ const styles = StyleSheet.create({
     flexWrap: "wrap",
   },
 });
-
-
-// function AudioPlayer(props) {
-//   const [isPlaying, setIsPlaying] = useState(false);
-//   const [playbackInstance, setPlaybackInstance] = useState(null);
-//   const [currentIndex, setCurrentIndex] = useState(0);
-//   const [volume, setVolume] = useState(1.0);
-//   const [isBuffering, setIsBuffering] = useState(false);
-
-//   const soundObject = new Audio.Sound();
-
-//   useEffect(() => {
-//     async function fetchData() {
-//       await Audio.setAudioModeAsync({
-//         allowsRecordingIOS: false,
-//         interruptionModeIOS: Audio.INTERRUPTION_MODE_IOS_DO_NOT_MIX,
-//         playsInSilentModeIOS: true,
-//         interruptionModeAndroid: Audio.INTERRUPTION_MODE_ANDROID_DUCK_OTHERS,
-//         shouldDuckAndroid: true,
-//         staysActiveInBackground: true,
-//         playThroughEarpieceAndroid: true,
-//       });
-
-//       loadAudio();
-//     }
-//     fetchData();
-//   }, []);
-
-//   const loadAudio = async () => {
-//     try {
-//       console.log('PROPS', props);
-//       const source = { uri: props.audioFiles[currentIndex].uri };
-//       const status = {
-//         shouldPlay: isPlaying,
-//         volume,
-//       };
-//       soundObject.setOnPlaybackStatusUpdate(setIsBuffering(status.isBuffering));
-//       await soundObject.loadAsync(source, status, false);
-//       setPlaybackInstance(soundObject);
-//     } catch (err) {
-//       console.log(err);
-//     }
-//   };
-
-//   const handlePlayPause = async () => {
-//     isPlaying
-//       ? await playbackInstance.pauseAsync()
-//       : await playbackInstance.playAsync();
-//     setIsPlaying(!isPlaying);
-//   };
-
-//   const handlePreviousTrack = async () => {
-//     if (playbackInstance) {
-//       await playbackInstance.unloadAsync();
-//       currentIndex < 1
-//         ? setCurrentIndex(props.audioFiles.length - 1)
-//         : setCurrentIndex(currentIndex - 1);
-//       loadAudio();
-//     }
-//   };
-
-//   const handleNextTrack = async () => {
-//     if (playbackInstance) {
-//       await playbackInstance.unloadAsync();
-//       currentIndex < props.audioFiles.length - 1
-//         ? setCurrentIndex(currentIndex + 1)
-//         : setCurrentIndex(0);
-//     }
-//   };
-
-//   const renderFileInfo = () => {
-//     return playbackInstance ? (
-//       <View style={styles.trackInfo}>
-//         <Text style={[styles.trackInfoText, styles.largeText]}>
-//           {props.audioFiles[currentIndex].title}
-//         </Text>
-//       </View>
-//     ) : null;
-//   };
-
-//   return (
-//     <View style={styles.container}>
-//       <View style={styles.controls}>
-//         <TouchableOpacity
-//           style={styles.control}
-//           onPress={handlePreviousTrack}
-//         >
-//           <AntDesign name="stepbackward" size={45} color="#444" />
-//         </TouchableOpacity>
-//         <TouchableOpacity style={styles.control} onPress={handlePlayPause}>
-//           {isPlaying ? (
-//             <Ionicons name="ios-pause" size={48} color="#444" />
-//           ) : (
-//             <Ionicons name="ios-play-circle" size={48} color="#444" />
-//           )}
-//         </TouchableOpacity>
-//         <TouchableOpacity style={styles.control} onPress={handleNextTrack}>
-//           <AntDesign name="stepforward" size={45} color="#444" />
-//         </TouchableOpacity>
-//       </View>
-//       {renderFileInfo()}
-//     </View>
-//   );
-// }
-
-// const styles = StyleSheet.create({
-//   container: {
-//     alignItems: "center",
-//     justifyContent: "center",
-//   },
-//   albumCover: {
-//     width: 250,
-//     height: 250,
-//   },
-//   control: {
-//     margin: 20,
-//   },
-//   controls: {
-//     flexDirection: "row",
-//   },
-//   largeText: {
-//     fontSize: 30,
-//   },
-//   trackInfo: {
-//     padding: 40,
-//   },
-//   trackInfoText: {
-//     textAlign: "center",
-//     flexWrap: "wrap",
-//   },
-// });
-
-// export default AudioPlayer;
