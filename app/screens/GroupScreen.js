@@ -4,7 +4,6 @@ import { Button } from "react-native-ios-kit";
 import AudioPlayer from "../components/AudioPlayer";
 import { endGroupSession, leaveGroupSession, getLeaderValue, getAudioFiles, firestore } from '../firebase';
 
-
 function GroupScreen({ route, navigation} ) {
   const { newGroup, user } = route.params;
   const [leaderValue, setLeaderValue] = useState("");
@@ -13,6 +12,7 @@ function GroupScreen({ route, navigation} ) {
   
   useEffect(() => {
     let isCancelled = true;
+
     async function fetchData() {
       const groupRef = firestore.collection('Group Rooms');
 

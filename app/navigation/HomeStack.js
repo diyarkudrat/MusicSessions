@@ -1,11 +1,9 @@
-import React, {useEffect} from 'react';
+import React from 'react';
 import {createStackNavigator} from '@react-navigation/stack';
-import { IconButton } from 'react-native-paper';
 import HomeScreen from "../screens/HomeScreen";
 import NewGroupScreen from '../screens/NewGroupScreen';
 import GroupScreen from '../screens/GroupScreen';
 import VotingScreen from '../screens/VotingScreen';
-import WaitingScreen from '../screens/WaitingScreen';
 
 const MusicSessionStack = createStackNavigator();
 const CreateNewSessionStack = createStackNavigator();
@@ -22,7 +20,6 @@ function MusicSession() {
               component={GroupScreen}
             />
             <MusicSessionStack.Screen component={VotingScreen} name="VoteNewLeader" />
-            <MusicSessionStack.Screen component={WaitingScreen} name="Wait" />
         </MusicSessionStack.Navigator>
     );
 }
