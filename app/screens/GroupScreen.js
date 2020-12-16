@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { SafeAreaView, View, StyleSheet, Text } from "react-native";
 import { Button } from "react-native-ios-kit";
 import AudioPlayer from "../components/AudioPlayer";
-import { endGroupSession, leaveGroupSession, getLeaderValue, getAudioFiles, firestore } from '../firebase';
+import { endGroupSession, leaveGroupSession, getAudioFiles, firestore } from '../firebase';
 
 function GroupScreen({ route, navigation} ) {
   const { newGroup, user } = route.params;
@@ -15,11 +15,12 @@ function GroupScreen({ route, navigation} ) {
     let isCancelled = true;
 
     async function fetchData() {
-      const groupRef = firestore.collection('Group Rooms');
+      const collection = firestore.collection('Group Rooms');
 
-      groupRef.doc(newGroup.id).onSnapshot(doc => {
+      collection.doc(newGroup.id).onSnapshot(doc => {
         if (doc.data()) {
           const { leader, users } = doc.data();
+
           setLeaderValue(leader);
           setSessionUsers(users);
 
@@ -34,6 +35,7 @@ function GroupScreen({ route, navigation} ) {
       setAudioFiles(files);
     }
     fetchData();
+    
     return () => { isCancelled = false };
   }, []);
 
@@ -75,7 +77,7 @@ function GroupScreen({ route, navigation} ) {
       <View style={styles.musicContainer}>
         <Text style={styles.text}>Group Name : {newGroup.roomName}</Text>
         <Text style={styles.text}>Group Code : {newGroup.code}</Text>
-        <Text style={styles.text}>Group Leader : {newGroup.id}</Text>
+        <Text style={styles.text}>Group Leader : {leaderValue}</Text>
         { leaderValue === null ? <Button inline inverted  onPress={() => navigation.navigate('VoteNewLeader', {
           users: sessionUsers,
           roomId: newGroup.id,

@@ -16,13 +16,11 @@ export default class App extends React.Component {
   }
 
   handlePlayPauseLocal = async () => {
-    const { isPlaying, playbackInstance } = this.state
+    const { isPlaying, playbackInstance } = this.state;
 
-    if (isPlaying === true) {
-      await playbackInstance.pauseAsync();
-    } else {
-      await playbackInstance.playAsync();
-    }
+    isPlaying ? 
+    await playbackInstance.pauseAsync() : 
+    await playbackInstance.playAsync();
  
     this.setState({
       isPlaying: !isPlaying
@@ -33,11 +31,13 @@ export default class App extends React.Component {
     firestore.collection('Group Rooms')
       .doc(this.props.roomId)
       .onSnapshot(doc => {
-        if (doc.data().currentSong.isPlaying !== this.state.isPlaying) {
-          this.handlePlayPauseLocal();
-        } else if (doc.data().currentSong.songId !== this.state.currSong) {
-          this.setState({ currSong : doc.data().currentSong.songId});
-          this.loadAudio();
+        if(doc.data()) {
+          if (doc.data().currentSong.isPlaying !== this.state.isPlaying) {
+            this.handlePlayPauseLocal();
+          } else if (doc.data().currentSong.songId !== this.state.currSong) {
+            this.setState({ currSong : doc.data().currentSong.songId});
+            this.loadAudio();
+          }
         }
       });
 
@@ -52,9 +52,9 @@ export default class App extends React.Component {
         playThroughEarpieceAndroid: true
       })
 
-      this.loadAudio()
+      this.loadAudio();
     } catch (e) {
-      console.log(e)
+      console.log(e);
     }
   }
 
@@ -67,26 +67,26 @@ export default class App extends React.Component {
   }
 
   async loadAudio() {
-    const { isPlaying, volume, currSong } = this.state
+    const { isPlaying, volume, currSong } = this.state;
    
     try {
-      const playbackInstance = new Audio.Sound()
+      const playbackInstance = new Audio.Sound();
       const song = this.props.audioFiles[currSong];
 
       const source = {
         uri: song.uri
-      }
-   
+      };
       const status = {
         shouldPlay: isPlaying,
         volume
-      }
+      };
    
-      playbackInstance.setOnPlaybackStatusUpdate(this.onPlaybackStatusUpdate)     
-      await playbackInstance.loadAsync(source, status, false)
-      this.setState({playbackInstance})
+      playbackInstance.setOnPlaybackStatusUpdate(this.onPlaybackStatusUpdate);
+      await playbackInstance.loadAsync(source, status, false);
+
+      this.setState({playbackInstance});
     } catch (e) {
-        console.log(e)
+        console.log(e);
     }
   }
 
@@ -98,11 +98,11 @@ export default class App extends React.Component {
 
   async updateIsPlaying() {
     const roomId = this.props.roomId;
-    const roomRef = firestore.collection('Group Rooms').doc(roomId);
-    const data = await roomRef.get()
+    const collection = firestore.collection('Group Rooms').doc(roomId);
+    const data = await collection.get();
     const currentSong = data.data().currentSong;
 
-    roomRef.update({
+    collection.update({
       currentSong: {
         ...currentSong,
         isPlaying: !currentSong.isPlaying
@@ -115,7 +115,7 @@ export default class App extends React.Component {
   };
 
   handlePlayPause = async () => {
-    const { isPlaying, playbackInstance } = this.state
+    const { isPlaying, playbackInstance } = this.state;
 
     if (isPlaying === true) {
       await this.updateIsPlaying();
@@ -127,15 +127,15 @@ export default class App extends React.Component {
  
     this.setState({
       isPlaying: !isPlaying
-    })
-  }
+    });
+  };
 
   async updateCurrentSong(newSongId) {
     const { title } = this.props.audioFiles[newSongId];
     const roomId = this.props.roomId;
-    const roomRef = firestore.collection('Group Rooms').doc(roomId);
+    const groupDoc = firestore.collection('Group Rooms').doc(roomId);
 
-    roomRef.update({
+    groupDoc.update({
       currentSong: {
         isPlaying: true,
         name: title,
@@ -146,7 +146,7 @@ export default class App extends React.Component {
     this.setState({
       isPlaying: true
     });
-  }
+  };
 
   handlePreviousTrack = async () => {
     let { playbackInstance, currentIndex, songIdArray } = this.state;
@@ -188,18 +188,6 @@ export default class App extends React.Component {
     }
   }
 
-  renderFileInfo() {
-    const { playbackInstance, currSong } = this.state;
-
-    return playbackInstance ? (
-      <View style={styles.trackInfo}>
-        <Text style={[styles.trackInfoText, styles.largeText]}>
-          { this.props.audioFiles[currSong].title }
-        </Text>
-      </View>
-    ) : null
-  }
-
   render() {
     return (
       <View style={styles.container}>
@@ -227,7 +215,14 @@ export default class App extends React.Component {
             </TouchableOpacity>
           </View> : null
         }
-        {this.renderFileInfo()}
+        { this.state.playbackInstance ?
+          <View style={styles.trackInfo}>
+            <Text style={[styles.trackInfoText, styles.largeText]}>
+              { this.props.audioFiles[this.state.currSong].title }
+            </Text>
+          </View>
+          : null
+        }
       </View>
     )
   }

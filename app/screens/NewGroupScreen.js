@@ -3,8 +3,6 @@ import {
   View,
   Text,
   TextInput,
-  TouchableWithoutFeedback,
-  Keyboard,
   StyleSheet,
 } from "react-native";
 import { Button } from "react-native-ios-kit";
@@ -18,6 +16,7 @@ function NewGroupScreen({ route, navigation }) {
   const handleButtonPress = async () => {
     if (name.length > 0) {
       const newGroup = await createNewGroup(name, user);
+
       navigation.navigate('GroupSession', {
         newGroup: newGroup,
         user: user

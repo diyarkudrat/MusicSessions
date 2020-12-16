@@ -5,7 +5,6 @@ import { updateLeaderVotes, setNewLeader } from '../firebase';
 
 function VotingScreen({ route, navigation }) {
     const [users, setUsers] = useState([]);
-    const [isWaiting, setIsWaiting] = useState(false);
 
     useEffect(() => {
         let isCancelled = false;
@@ -45,7 +44,7 @@ function VotingScreen({ route, navigation }) {
 
         setUsers(updatedUsers);
         updateLeaderVotes(clickedUser.user, route.params.roomId);
-        
+
         setTimeout(() => {
             setNewLeader(route.params.roomId);
             navigation.navigate('GroupSession');
@@ -55,7 +54,7 @@ function VotingScreen({ route, navigation }) {
     return (
         <SafeAreaView style={styles.container}>
             <View>
-                { isWaiting ? <Text style={styles.text}>Waiting...</Text> : users ? showUsers() : null }
+                { users ? showUsers() : null }
             </View>
         </SafeAreaView>
     );
