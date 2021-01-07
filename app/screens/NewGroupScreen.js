@@ -7,7 +7,7 @@ import {
 } from "react-native";
 import { Button } from "react-native-ios-kit";
 import { IconButton } from "react-native-paper";
-import { createNewGroup, getGroupSession } from '../firebase';
+import { createNewGroup } from '../firebase';
 
 function NewGroupScreen({ route, navigation }) {
   const [name, setName] = useState('');

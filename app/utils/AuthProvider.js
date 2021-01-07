@@ -21,6 +21,7 @@ export const AuthProvider = ({children}) => {
               register: async (email, password) => {
                   try {
                       const user = await auth.createUserWithEmailAndPassword(email, password);
+                      debugger;
                       generateUserDocument(user);
                   } catch (err) {
                       console.log(err);

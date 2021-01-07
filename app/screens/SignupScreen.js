@@ -7,12 +7,14 @@ import {
 } from "react-native";
 import { Button } from "react-native-ios-kit";
 import { IconButton } from "react-native-paper";
-import { AuthContext } from '../navigation/AuthProvider';
+import { AuthContext } from '../utils/AuthProvider';
 
 function SignupScreen({ navigation }) {
   const { register } = useContext(AuthContext);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
 
   return (
     <View style={styles.container}>
@@ -33,6 +35,20 @@ function SignupScreen({ navigation }) {
         style={styles.formInput}
         onChangeText={(event) => setPassword(event)}
       />
+      {/* <TextInput
+        placeholder="Enter First Name"
+        labelName="firstName"
+        value={firstName}
+        style={styles.formInput}
+        onChangeText={(event) => setFirstName(event)}
+      />
+      <TextInput
+        placeholder="Enter Last Name"
+        labelName="lastName"
+        value={lastName}
+        style={styles.formInput}
+        onChangeText={(event) => setLastName(event)}
+      /> */}
       <Button
         inline
         inverted

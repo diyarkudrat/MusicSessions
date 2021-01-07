@@ -4,13 +4,13 @@ import "firebase/firestore";
 import "firebase/storage";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyDJ1K_u9lRRtkP6pzbZzN2-0mFWesMaTb8",
-  authDomain: "music-sessions-rn.firebaseapp.com",
-  projectId: "music-sessions-rn",
-  storageBucket: "music-sessions-rn.appspot.com",
-  messagingSenderId: "190063416356",
-  appId: "1:190063416356:web:02d235d69d0aaf309974b1",
-  measurementId: "G-HEXX8KJPBF"
+  apiKey: "AIzaSyCskv9ivRpPqAI1UedCSyzBo65zl4NsAqQ",
+  authDomain: "winter-intensive.firebaseapp.com",
+  projectId: "winter-intensive",
+  storageBucket: "winter-intensive.appspot.com",
+  messagingSenderId: "1003820019094",
+  appId: "1:1003820019094:web:039c75ace5c1cbfc9841b7",
+  measurementId: "G-XK3GZPKWZ8"
 };
 
 // Initialize Firebase
@@ -200,12 +200,11 @@ export const generateUserDocument = async (user) => {
   const snapshot = await collection.get();
 
   if (!snapshot.exists) {
-    const { email } = user;
-
+    debugger;
     try {
       await collection.set({
-        email: email,
-        userId: user.uid
+        email: user.email,
+        userId: user.uid,
       });
     } catch (err) {
       console.log('Error creating user document', err);
