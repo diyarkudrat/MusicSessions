@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { SafeAreaView, View, StyleSheet, Text } from "react-native";
 import { Button } from "react-native-ios-kit";
 import AudioPlayer from "../components/AudioPlayer";
-import { endGroupSession, leaveGroupSession, getAudioFiles, firestore } from '../firebase';
+import { endGroupSession, leaveGroupSession, firestore } from '../firebase';
 
 function GroupScreen({ route, navigation} ) {
   const { newGroup, user } = route.params;
@@ -29,10 +29,6 @@ function GroupScreen({ route, navigation} ) {
           }
         }
       })
-
-      const files = await getAudioFiles(newGroup.id);
-
-      setAudioFiles(files);
     }
     fetchData();
     
