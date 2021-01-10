@@ -22,7 +22,7 @@ const authEndpoints = {
 function NewGroupScreen({ route, navigation }) {
   const [name, setName] = useState('');
   const [playlists, setPlaylists] = useState([]);
-  const [chosenPlaylist, setChosenPlaylist] = useState('');
+  const [chosenPlaylist, setChosenPlaylist] = useState({});
   const { user } = route.params;
 
   const [req, res, promptAsync] = useAuthRequest(
@@ -37,14 +37,11 @@ function NewGroupScreen({ route, navigation }) {
   );
 
   useEffect(() => {
-    function fetchData() {
-      if (res?.type === 'success') {
-        const { access_token } = res.params;
+    if (res?.type === 'success') {
+      const { access_token } = res.params;
 
-        handlePlaylistData(access_token);
-      }
+      handlePlaylistData(access_token);
     }
-    fetchData();
   }, [res]);
 
   const handlePlaylistData = async (accessToken) => {
@@ -81,12 +78,11 @@ function NewGroupScreen({ route, navigation }) {
     });
     
     setPlaylists(updatedPlaylists)
-    setChosenPlaylist(clickedPlaylist.playlist.playlist);
-    console.log('CLICKED PLAYLIST', chosenPlaylist);
+    setChosenPlaylist(clickedPlaylist.playlist);
   };
-
+  
   const handleButtonPress = async () => {
-    if (name.length > 0) {
+    if (name.length > 0 && chosenPlaylist) {
       const newGroup = await createNewGroup(name, user);
 
       navigation.navigate('GroupSession', {
@@ -94,7 +90,9 @@ function NewGroupScreen({ route, navigation }) {
         user: user,
         playlist: chosenPlaylist
       });
-    };
+    } else {
+      alert('Enter Name and Select Playlist')
+    }
   };
 
   return (
