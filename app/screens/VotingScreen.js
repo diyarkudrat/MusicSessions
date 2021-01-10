@@ -29,7 +29,6 @@ function VotingScreen({ route, navigation }) {
     const showUsers = () => {
         return users.map((user) => 
           <CheckBox center title={user.user} key={user.user} checked={user.checked} onPress={() => handleOnPress(user)} />
-          
         )
     };
 

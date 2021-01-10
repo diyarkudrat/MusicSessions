@@ -13,9 +13,13 @@
     "@react-native-community/slider": "^3.0.3",
     "@react-navigation/native": "^5.8.10",
     "@react-navigation/stack": "^5.12.8",
+    "base-64": "^1.0.0",
     "expo": "^39.0.5",
+    "expo-auth-session": "~2.0.0",
     "expo-av": "~8.6.0",
     "expo-file-system": "~9.2.0",
+    "expo-linking": "^2.0.0",
+    "expo-random": "~9.0.0",
     "expo-status-bar": "~1.0.3",
     "firebase": "7.9.0",
     "firebase-admin": "^9.4.2",
@@ -35,7 +39,9 @@
     "react-native-swift": "^1.2.3",
     "react-native-track-player": "^1.2.3",
     "react-native-web": "~0.13.12",
-    "react-navigation": "^4.4.3"
+    "react-navigation": "^4.4.3",
+    "spotify-web-api-js": "^1.5.1",
+    "uri-scheme": "^1.0.59"
   },
   "devDependencies": {
     "@babel/core": "~7.9.0"

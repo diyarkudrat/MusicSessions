@@ -1,17 +1,88 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
+  ScrollView,
   View,
   Text,
   TextInput,
   StyleSheet,
 } from "react-native";
 import { Button } from "react-native-ios-kit";
+import { CheckBox } from 'react-native-elements';
 import { IconButton } from "react-native-paper";
+import { useAuthRequest, ResponseType } from 'expo-auth-session';
 import { createNewGroup } from '../firebase';
+import { accessTokenAPI, getCurrentUserPlaylists } from '../spotify';
+
+const authEndpoints = {
+  authorizationEndpoint: 'https://accounts.spotify.com/authorize',
+  tokenEndpoint: 'https://accounts.spotify.com/api/token',
+};
+
 
 function NewGroupScreen({ route, navigation }) {
   const [name, setName] = useState('');
+  const [playlists, setPlaylists] = useState([]);
+  const [chosenPlaylist, setChosenPlaylist] = useState('');
   const { user } = route.params;
+
+  const [req, res, promptAsync] = useAuthRequest(
+    {
+      responseType: ResponseType.Token,
+      clientId: '1b1e017c24664c55b32c923a503231e9',
+      scopes: ['user-modify-playback-state', 'playlist-read-private'],
+      usePKCE: false,
+      redirectUri: 'exp://127.0.0.1:19000/--/redirect',
+    },
+    authEndpoints
+  );
+
+  useEffect(() => {
+    function fetchData() {
+      if (res?.type === 'success') {
+        const { access_token } = res.params;
+        // console.log('ACCESS TOKEN', access_token);
+
+        handlePlaylistData(access_token);
+      }
+    }
+    fetchData();
+  }, [res]);
+
+  const handlePlaylistData = async (accessToken) => {
+    await accessTokenAPI(accessToken);
+    const playlistsData = await getCurrentUserPlaylists();
+    // console.log('data', playlistsData);
+    const data = playlistsData.items.map((playlist) => {
+      return { playlist, checked: false };
+    })
+
+    setPlaylists(data);
+    // console.log('PLAYLISTS', playlists);
+  };
+
+  const showPlaylists = () => {
+    return <View style={{ height: 200 }}>
+      <ScrollView style={styles.playlistList}>
+        {playlists.map((playlist) => {
+          return (
+            <CheckBox center title={playlist.playlist.name} key={playlist.playlist.id} checked={playlist.checked} onPress={() => handleOnPress(playlist)} />
+          )
+        })}
+      </ScrollView>
+    </View>
+  };
+
+  const handleOnPress = (clickedPlaylist) => {
+    const updatedPlaylist = playlists.map(playlist => {
+      if (playlist.id === clickedPlaylist.id) {
+        return { ...playlist, checked: true };
+      }
+
+      return playlist;
+    });
+
+    setChosenPlaylist(updatedPlaylist);
+  };
 
   const handleButtonPress = async () => {
     if (name.length > 0) {
@@ -19,7 +90,8 @@ function NewGroupScreen({ route, navigation }) {
 
       navigation.navigate('GroupSession', {
         newGroup: newGroup,
-        user: user
+        user: user,
+        playlist: chosenPlaylist
       });
     };
   };
@@ -39,6 +111,11 @@ function NewGroupScreen({ route, navigation }) {
         <Button inline inverted style={styles.button} onPress={handleButtonPress}>
           Create
         </Button>
+          { res?.type === 'success' ? showPlaylists() : <Button inline inverted style={styles.spotifyButton} disabled={!req} onPress={() => {
+            promptAsync();
+          }}>
+            Login to Spotify
+          </Button> }
         <IconButton
           icon="keyboard-backspace"
           size={30}
@@ -68,6 +145,15 @@ const styles = StyleSheet.create({
     top: 30,
     borderRadius: 30,
   },
+  spotifyButton: {
+    backgroundColor: "#20E4B5",
+    height: 50,
+    width: 300,
+    justifyContent: "center",
+    alignItems: "center",
+    top: 50,
+    borderRadius: 30,
+  },
   formContainer: {
     bottom: 60,
     alignItems: "center",
@@ -86,7 +172,11 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   navButton: {
-    top: 40
+    top: 60
+  },
+  playlistList: {
+    flex: 1,
+    top: 50,
   }
 });
 

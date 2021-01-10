@@ -6,7 +6,7 @@ import {
   TextInput,
 } from "react-native";
 import { Button } from "react-native-ios-kit";
-import { AuthContext } from '../navigation/AuthProvider';
+import { AuthContext } from '../utils/AuthProvider';
 
 function LoginScreen({ navigation }) {
   const { login } = useContext(AuthContext);

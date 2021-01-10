@@ -1,7 +1,7 @@
 import React, { useContext, useState, useEffect } from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { auth, generateUserDocument } from '../firebase';
-import { AuthContext } from './AuthProvider';
+import { AuthContext } from '../utils/AuthProvider';
 import AuthStack from "./AuthStack";
 import HomeStack from './HomeStack';
 
