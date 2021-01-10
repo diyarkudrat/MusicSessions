@@ -34,6 +34,7 @@ function VotingScreen({ route, navigation }) {
 
     const handleOnPress = async (clickedUser) => {
         const updatedUsers = users.map(user => {
+            debugger;
             if (user.user === clickedUser.user) {
                 return { ...user, checked: true };
             }

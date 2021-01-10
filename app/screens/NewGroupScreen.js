@@ -40,7 +40,6 @@ function NewGroupScreen({ route, navigation }) {
     function fetchData() {
       if (res?.type === 'success') {
         const { access_token } = res.params;
-        // console.log('ACCESS TOKEN', access_token);
 
         handlePlaylistData(access_token);
       }
@@ -51,13 +50,12 @@ function NewGroupScreen({ route, navigation }) {
   const handlePlaylistData = async (accessToken) => {
     await accessTokenAPI(accessToken);
     const playlistsData = await getCurrentUserPlaylists();
-    // console.log('data', playlistsData);
+
     const data = playlistsData.items.map((playlist) => {
       return { playlist, checked: false };
     })
 
     setPlaylists(data);
-    // console.log('PLAYLISTS', playlists);
   };
 
   const showPlaylists = () => {
@@ -73,15 +71,18 @@ function NewGroupScreen({ route, navigation }) {
   };
 
   const handleOnPress = (clickedPlaylist) => {
-    const updatedPlaylist = playlists.map(playlist => {
-      if (playlist.id === clickedPlaylist.id) {
+    
+    const updatedPlaylists = playlists.map(playlist => {
+      if (playlist.playlist.id === clickedPlaylist.playlist.id) {
         return { ...playlist, checked: true };
       }
-
+      
       return playlist;
     });
-
-    setChosenPlaylist(updatedPlaylist);
+    
+    setPlaylists(updatedPlaylists)
+    setChosenPlaylist(clickedPlaylist.playlist.playlist);
+    console.log('CLICKED PLAYLIST', chosenPlaylist);
   };
 
   const handleButtonPress = async () => {
