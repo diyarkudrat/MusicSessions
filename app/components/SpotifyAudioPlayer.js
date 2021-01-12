@@ -2,7 +2,7 @@ import React from "react";
 import { TouchableOpacity, View, Image, StyleSheet, Text } from "react-native";
 import { Ionicons, AntDesign } from "@expo/vector-icons";
 import { firestore } from '../firebase';
-import { playMusic, pauseMusic } from '../spotify';
+import { playMusic, pauseMusic, skipForward, skipPrevious, currentTrackPlaying } from '../spotify';
 
 export default class App extends React.Component {
   state = {
@@ -11,122 +11,84 @@ export default class App extends React.Component {
     currentIndex: 0,
     volume: 1.0,
     isBuffering: false,
+    playlistName: '',
     // currSong: this.getFirstSong(this.props.audioFiles),
     // songIdArray: this.getIdKeys(this.props.audioFiles),
   }
 
-//   handlePlayPauseLocal = async () => {
-//     const { isPlaying, playbackInstance } = this.state;
+  handlePlayPauseLocal = async () => {
+    // const { isPlaying, playbackInstance } = this.state;
 
-//     isPlaying ? 
-//     await playbackInstance.pauseAsync() : 
-//     await playbackInstance.playAsync();
+    // isPlaying ? 
+    // await pauseMusic() : 
+    // await playMusic();
  
-//     this.setState({
-//       isPlaying: !isPlaying
-//     });
-//   }
+    // this.setState({
+    //   isPlaying: !isPlaying
+    // });
+    console.log('!!!!!!!!!!!')
+  }
 
-//   async componentDidMount() {
-//     firestore.collection('Group Rooms')
-//       .doc(this.props.roomId)
-//       .onSnapshot(doc => {
-//         if(doc.data()) {
-//           if (doc.data().currentSong.isPlaying !== this.state.isPlaying) {
-//             this.handlePlayPauseLocal();
-//           } else if (doc.data().currentSong.songId !== this.state.currSong) {
-//             this.setState({ currSong : doc.data().currentSong.songId});
-//             this.loadAudio();
-//           }
-//         }
-//       });
+  async componentDidMount() {
+    console.log(this.state.playlistName);
+    firestore.collection('Group Rooms')
+      .doc(this.props.roomId)
+      .onSnapshot(doc => {
+        if(doc.data()) {
+          this.setState({ playlistName: doc.data().playlistName })
+          if (doc.data().currentSong.isPlaying !== this.state.isPlaying) {
+            this.handlePlayPauseLocal();
+          } else if (doc.data().currentSong.songId !== this.state.currSong) {
+            this.setState({ currSong : doc.data().currentSong.songId});
+          }
+        }
+      });
+  }
 
-//     try {
-//       await Audio.setAudioModeAsync({
-//         allowsRecordingIOS: false,
-//         interruptionModeIOS: Audio.INTERRUPTION_MODE_IOS_DO_NOT_MIX,
-//         playsInSilentModeIOS: true,
-//         interruptionModeAndroid: Audio.INTERRUPTION_MODE_ANDROID_DUCK_OTHERS,
-//         shouldDuckAndroid: true,
-//         staysActiveInBackground: true,
-//         playThroughEarpieceAndroid: true
-//       })
 
-//       this.loadAudio();
-//     } catch (e) {
-//       console.log(e);
-//     }
-//   }
+  async updateIsPlaying() {
+    const roomId = this.props.roomId;
+    const collection = firestore.collection('Group Rooms').doc(roomId);
+    const data = await collection.get();
+    const currentSong = data.data().currentSong;
 
-//   getFirstSong(obj) {
-//     return Object.keys(obj)[0];
-//   };
-  
-//   getIdKeys(obj) {
-//     return Object.keys(obj);
-//   }
+    collection.update({
+      currentSong: {
+        ...currentSong,
+        isPlaying: !currentSong.isPlaying
+      }
+    });
 
-//   async loadAudio() {
-//     const { isPlaying, volume, currSong } = this.state;
-   
-//     try {
-//       const playbackInstance = new Audio.Sound();
-//       const song = this.props.audioFiles[currSong];
-
-//       const source = {
-//         uri: song.uri
-//       };
-//       const status = {
-//         shouldPlay: isPlaying,
-//         volume
-//       };
-   
-//       playbackInstance.setOnPlaybackStatusUpdate(this.onPlaybackStatusUpdate);
-//       await playbackInstance.loadAsync(source, status, false);
-
-//       this.setState({playbackInstance});
-//     } catch (e) {
-//         console.log(e);
-//     }
-//   }
-
-//   onPlaybackStatusUpdate = status => {
-//     this.setState({
-//       isBuffering: status.isBuffering
-//     })
-//   }
-
-//   async updateIsPlaying() {
-//     const roomId = this.props.roomId;
-//     const collection = firestore.collection('Group Rooms').doc(roomId);
-//     const data = await collection.get();
-//     const currentSong = data.data().currentSong;
-
-//     collection.update({
-//       currentSong: {
-//         ...currentSong,
-//         isPlaying: !currentSong.isPlaying
-//       }
-//     });
-
-//     this.setState({
-//       isPlaying: false
-//     });
-//   };
+    this.setState({
+      isPlaying: false
+    });
+  };
 
   handlePlayPause = async () => {
     const { isPlaying } = this.state;
+    console.log('isPlayinggg', isPlaying);
 
     if (isPlaying === true) {
       await pauseMusic();
     } else {
         await playMusic(this.props.playlist.uri);
+        const data = await currentTrackPlaying();
+        console.log('DATAAA', data);
     }
  
     this.setState({
       isPlaying: !isPlaying
     });
   };
+
+  handleNextTrack = async () => {
+    await skipForward();
+  };
+
+  handlePreviousTrack = async () => {
+    await skipPrevious();
+  };
+
 
 //   async updateCurrentSong(newSongId) {
 //     const { title } = this.props.audioFiles[newSongId];
@@ -193,6 +155,11 @@ export default class App extends React.Component {
           style={styles.albumCover}
           source={require('../assets/vinyl.png')}
         /> */}
+        <View style={styles.trackInfo}>
+          <Text style={[styles.trackInfoText, styles.largeText]}>
+            { this.state.playlistName }
+          </Text>
+        </View>
         { this.props.isLeader ?
           <View style={styles.controls}>
             <TouchableOpacity
@@ -213,14 +180,6 @@ export default class App extends React.Component {
             </TouchableOpacity>
           </View> : null
         }
-        { this.state.playbackInstance ?
-          <View style={styles.trackInfo}>
-            <Text style={[styles.trackInfoText, styles.largeText]}>
-              { this.props.audioFiles[this.state.currSong].title }
-            </Text>
-          </View>
-          : null
-        }
       </View>
     )
   }
@@ -240,12 +199,13 @@ const styles = StyleSheet.create({
   },
   controls: {
     flexDirection: "row",
+    top: 120
   },
   largeText: {
     fontSize: 30,
   },
   trackInfo: {
-    padding: 40,
+    top: 40
   },
   trackInfoText: {
     textAlign: "center",

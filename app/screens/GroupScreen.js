@@ -30,9 +30,11 @@ function GroupScreen({ route, navigation} ) {
 
           setLeaderValue(leader);
           setSessionUsers(users);
-          setNumOfUsers(users.length);
 
-          if (leader === user.name) {
+          setNumOfUsers(users.length);
+          console.log('LEADER VALUE', leader)
+
+          if (leader === user.uid) {
             setIsLeader(true);
           }
         }
@@ -89,6 +91,7 @@ function GroupScreen({ route, navigation} ) {
           roomId: newGroup.id,
         })}>Vote for New Leader</Button> : null }
         <Button inline inverted style={styles.spotifyButton} onPress={() => navigation.navigate('SearchSong')}>Search For Song!</Button>
+        {/* <Button inline inverted onPress={() => navigation.navigate('SearchSong')}>Search For Song!</Button> */}
         <SpotifyAudioPlayer playlist={playlist} roomId={newGroup.id} isLeader={isLeader} />
       </View>
     </SafeAreaView>
@@ -136,7 +139,7 @@ const styles = StyleSheet.create({
     width: 300,
     justifyContent: "center",
     alignItems: "center",
-    top: 50,
+    // top: 50,
     borderRadius: 30,
   },
   text: {

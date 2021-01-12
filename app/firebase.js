@@ -22,11 +22,12 @@ export const auth = firebase.auth();
 export const firestore = firebase.firestore();
 
 // Create new Session
-export const createNewGroup = async (name, user) => {
+export const createNewGroup = async (name, user, playlist) => {
   const groupCode = Math.floor(Math.random()*90000) + 10000;
   const newRoom = await firestore.collection('Group Rooms').add({
     roomName: name,
     code: groupCode,
+    playlistName: playlist.name,
     leader: user.uid,
     users: [user.uid],
     currentSong: {},

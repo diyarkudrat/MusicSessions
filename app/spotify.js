@@ -54,7 +54,7 @@ export const addQueue = async (uri) => {
 };
 
 export const currentTrackPlaying = async () => {
-    const data = await spotifyClient.getMyCurrentPlayingTrack();
+    const data = await spotifyClient.getMyCurrentPlaybackState();
 
     return data;
 };

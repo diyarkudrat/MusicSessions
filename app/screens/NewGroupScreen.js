@@ -83,10 +83,11 @@ function NewGroupScreen({ route, navigation }) {
   
   const handleButtonPress = async () => {
     if (name.length > 0 && chosenPlaylist) {
-      const newGroup = await createNewGroup(name, user);
+      const newGroup = await createNewGroup(name, user, chosenPlaylist);
 
       navigation.navigate('GroupSession', {
         newGroup: newGroup,
+        
         user: user,
         playlist: chosenPlaylist
       });

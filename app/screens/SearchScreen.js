@@ -23,15 +23,6 @@ function SearchScreen({ route, navigation }) {
     const [chosenSong, setChosenSong] = useState('');
     const [accessToken, setAccessToken] = useState('');
 
-    useEffect(() => {
-        if (res?.type === 'success') {
-            const { access_token } = res.params;
-
-            setAccessToken(access_token);
-            console.log('TOKENNN', accessToken);
-        }
-    }, [res]);
-
     const [req, res, promptAsync] = useAuthRequest(
         {
           responseType: ResponseType.Token,
@@ -42,6 +33,16 @@ function SearchScreen({ route, navigation }) {
         },
         authEndpoints
       );
+      
+    useEffect(() => {
+        if (res?.type === 'success') {
+            const { access_token } = res.params;
+
+            setAccessToken(access_token);
+            console.log('TOKENNN', accessToken);
+        }
+    }, [res]);
+
 
     const displaySearchBar = () => {
         return (
