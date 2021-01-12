@@ -28,6 +28,14 @@ export const pauseMusic = async () => {
     await spotifyClient.pause();
 };
 
+export const skipForward = async () => {
+    await spotifyClient.skipToNext();
+};
+
+export const skipPrevious = async () => {
+    await spotifyClient.skipToPrevious();
+};
+
 export const getPlaylistTracks = async (id) => {
     const tracks = await spotifyClient.getPlaylistTracks(id);
 
@@ -44,4 +52,18 @@ export const searchQuery = async (query) => {
 export const addQueue = async (uri) => {
     await spotifyClient.queue(uri);
 };
+
+export const currentTrackPlaying = async () => {
+    const data = await spotifyClient.getMyCurrentPlayingTrack();
+
+    return data;
+};
+
+export const getDeviceId = async () => {
+    const data = await spotifyClient.getMyDevices();
+
+    return data[0].id;
+};
+
+
 

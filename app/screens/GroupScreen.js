@@ -2,13 +2,15 @@ import React, { useState, useEffect } from "react";
 import { SafeAreaView, View, StyleSheet, Text } from "react-native";
 import { Button } from "react-native-ios-kit";
 import SpotifyAudioPlayer from '../components/SpotifyAudioPlayer';
-import { endGroupSession, leaveGroupSession, firestore } from '../firebase';
+import { endGroupSession, leaveGroupSession, firestore, getLeaderName } from '../firebase';
 
 
 function GroupScreen({ route, navigation} ) {
   const { newGroup, user, playlist } = route.params;
   const [leaderValue, setLeaderValue] = useState("");
+  const [leaderName, setLeaderName] = useState("");
   const [sessionUsers, setSessionUsers] = useState([]);
+  const [numOfUsers, setNumOfUsers] = useState(1);
   const [isLeader, setIsLeader] = useState(false);
   
   useEffect(() => {
@@ -18,14 +20,19 @@ function GroupScreen({ route, navigation} ) {
 
       const collection = firestore.collection('Group Rooms');
 
-      collection.doc(newGroup.id).onSnapshot(doc => {
+      collection.doc(newGroup.id).onSnapshot(async doc => {
         if (doc.data()) {
           const { leader, users } = doc.data();
+          if (leader) {
+            const name = await getLeaderName(leader);
+            setLeaderName(name);
+          }
 
           setLeaderValue(leader);
           setSessionUsers(users);
+          setNumOfUsers(users.length);
 
-          if (leader === user.userId) {
+          if (leader === user.name) {
             setIsLeader(true);
           }
         }
@@ -75,12 +82,14 @@ function GroupScreen({ route, navigation} ) {
         <Text style={styles.roomName}>{newGroup.roomName}</Text>
         <Text style={styles.text}>Share this Group Code for Others to Join!</Text>
         <Text style={styles.groupCode}>{newGroup.code}</Text>
-        <Text style={styles.text}>Group Leader : {leaderValue}</Text>
+        <Text style={styles.text}>Group Leader : {leaderName}</Text>
+        <Text style={styles.text}># Users in Group : {numOfUsers}</Text>
         { leaderValue === null ? <Button inline inverted  onPress={() => navigation.navigate('VoteNewLeader', {
           users: sessionUsers,
           roomId: newGroup.id,
         })}>Vote for New Leader</Button> : null }
         <Button inline inverted style={styles.spotifyButton} onPress={() => navigation.navigate('SearchSong')}>Search For Song!</Button>
+        <SpotifyAudioPlayer playlist={playlist} roomId={newGroup.id} isLeader={isLeader} />
       </View>
     </SafeAreaView>
   );

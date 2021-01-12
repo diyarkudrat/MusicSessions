@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { SafeAreaView, StyleSheet, Text, View } from 'react-native';
 import { CheckBox } from 'react-native-elements';
-import { updateLeaderVotes, setNewLeader } from '../firebase';
+import { updateLeaderVotes, setNewLeader, getLeaderName } from '../firebase';
 
 function VotingScreen({ route, navigation }) {
     const [users, setUsers] = useState([]);

@@ -189,10 +189,10 @@ export default class App extends React.Component {
   render() {
     return (
       <View style={styles.container}>
-        <Image
+        {/* <Image
           style={styles.albumCover}
           source={require('../assets/vinyl.png')}
-        />
+        /> */}
         { this.props.isLeader ?
           <View style={styles.controls}>
             <TouchableOpacity

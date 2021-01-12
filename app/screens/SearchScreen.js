@@ -94,7 +94,10 @@ function SearchScreen({ route, navigation }) {
     };
 
     const addToQueue = async () => {
+        await accessTokenAPI(accessToken);
         await addQueue(chosenSong);
+
+        alert('Song Successfully Added to Queue!');
 
         setTimeout(() => {
             navigation.navigate('GroupSession');
