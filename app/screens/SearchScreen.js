@@ -7,9 +7,9 @@ import {
     ScrollView
   } from "react-native";
 import { Button } from "react-native-ios-kit";
-import { CheckBox } from 'react-native-elements';
+import { CheckBox, Image } from 'react-native-elements';
 import { IconButton } from "react-native-paper";
-import { accessTokenAPI, searchQuery } from '../spotify';
+import { accessTokenAPI, searchQuery, addQueue } from '../spotify';
 import { useAuthRequest, ResponseType } from 'expo-auth-session';
 
 const authEndpoints = {
@@ -20,7 +20,7 @@ tokenEndpoint: 'https://accounts.spotify.com/api/token',
 function SearchScreen({ route, navigation }) {
     const [query, setQuery] = useState('');
     const [data, setData] = useState([]);
-    const [chosenSong, setChosenSong] = useState({});
+    const [chosenSong, setChosenSong] = useState('');
     const [accessToken, setAccessToken] = useState('');
 
     useEffect(() => {
@@ -28,7 +28,7 @@ function SearchScreen({ route, navigation }) {
             const { access_token } = res.params;
 
             setAccessToken(access_token);
-            console.log('TOKEN', accessToken);
+            console.log('TOKENNN', accessToken);
         }
     }, [res]);
 
@@ -53,7 +53,7 @@ function SearchScreen({ route, navigation }) {
               value={query}
               onChangeText={(event) => setQuery(event)}
             />
-            <Button inline inverted onPress={getSearchData}>Search</Button>
+            <Button inline inverted style={styles.searchButton} onPress={getSearchData}>Search</Button>
             </>
         )
     };
@@ -69,7 +69,7 @@ function SearchScreen({ route, navigation }) {
     };
 
     const displaySearchData = () => {
-        return <View style={{ height: 200 }}>
+        return <View style={{ height: 200, top: 40 }}>
         <ScrollView>
           {data.map((song) => {
             return (
@@ -82,16 +82,24 @@ function SearchScreen({ route, navigation }) {
 
     const handleOnPress = (checkedSong) => {
         const updatedSongsData = data.map(song => {
-          if (song.song.id === checkedSong.id) {
+          if (song.song.id === checkedSong.song.id) {
             return { ...song, checked: true };
           }
           
           return song;
         });
         
-        setdata(updatedSongsData);
-        setChosenSong(checkedSong.song);
+        setData(updatedSongsData);
+        setChosenSong(checkedSong.song.uri);
     };
+
+    const addToQueue = async () => {
+        await addQueue(chosenSong);
+
+        setTimeout(() => {
+            navigation.navigate('GroupSession');
+        }, 3000);
+    }
 
 
     return (
@@ -104,6 +112,7 @@ function SearchScreen({ route, navigation }) {
         </Button> }
       
       { data ? displaySearchData() : null }
+      { chosenSong ? <Button inline inverted style={styles.spotifyButton} onPress={addToQueue}>Add to Queue</Button> : null }
     
       <IconButton
         icon="keyboard-backspace"
@@ -150,6 +159,15 @@ const styles = StyleSheet.create({
       marginBottom: 10,
       color: "#fff",
       fontWeight: "bold",
+    },
+    searchButton: {
+        backgroundColor: "#20E4B5",
+        height: 50,
+        width: 300,
+        justifyContent: "center",
+        alignItems: "center",
+        top: 10,
+        borderRadius: 30,
     },
     spotifyButton: {
         backgroundColor: "#20E4B5",

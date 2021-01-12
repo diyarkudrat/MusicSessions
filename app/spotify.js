@@ -41,3 +41,7 @@ export const searchQuery = async (query) => {
     return data;
 };
 
+export const addQueue = async (uri) => {
+    await spotifyClient.queue(uri);
+};
+
