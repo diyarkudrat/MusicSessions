@@ -4,6 +4,7 @@ import HomeScreen from "../screens/HomeScreen";
 import NewGroupScreen from '../screens/NewGroupScreen';
 import GroupScreen from '../screens/GroupScreen';
 import VotingScreen from '../screens/VotingScreen';
+import SearchScreen from '../screens/SearchScreen';
 
 const MusicSessionStack = createStackNavigator();
 const CreateNewSessionStack = createStackNavigator();
@@ -20,6 +21,7 @@ function MusicSession() {
               component={GroupScreen}
             />
             <MusicSessionStack.Screen component={VotingScreen} name="VoteNewLeader" />
+            <MusicSessionStack.Screen component={SearchScreen} name="SearchSong" />
         </MusicSessionStack.Navigator>
     );
 }

@@ -193,18 +193,18 @@ function mostFreq(arr) {
 }
 
 // create new User document
-export const generateUserDocument = async (user) => {
+export const generateUserDocument = async (user, name) => {
   if (!user) return;
 
   const collection = firestore.doc(`Users/${user.uid}`);
   const snapshot = await collection.get();
 
   if (!snapshot.exists) {
-    debugger;
     try {
       await collection.set({
         email: user.email,
         userId: user.uid,
+        name
       });
     } catch (err) {
       console.log('Error creating user document', err);

@@ -17,5 +17,27 @@ export const getCurrentUserPlaylists = async () => {
     const playlists = await spotifyClient.getUserPlaylists(userId);
     
     return playlists;
-}
+};
+
+export const playMusic = async (uri) => {
+    const options = { "context_uri": uri };
+    await spotifyClient.play(options);
+};
+
+export const pauseMusic = async () => {
+    await spotifyClient.pause();
+};
+
+export const getPlaylistTracks = async (id) => {
+    const tracks = await spotifyClient.getPlaylistTracks(id);
+
+    return tracks
+};
+
+export const searchQuery = async (query) => {
+    const types = ['track']
+    const data = await spotifyClient.search(query, types)
+
+    return data;
+};
 

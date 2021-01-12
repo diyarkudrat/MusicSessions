@@ -13,8 +13,7 @@ function SignupScreen({ navigation }) {
   const { register } = useContext(AuthContext);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
+  const [name, setName] = useState("");
 
   return (
     <View style={styles.container}>
@@ -28,6 +27,13 @@ function SignupScreen({ navigation }) {
         onChangeText={(event) => setEmail(event)}
       />
       <TextInput
+        placeholder="Enter First and Last Name"
+        labelName="name"
+        value={name}
+        style={styles.formInput}
+        onChangeText={(event) => setName(event)}
+      />
+      <TextInput
         placeholder="Enter Password"
         labelName="password"
         secureTextEntry={true}
@@ -35,25 +41,11 @@ function SignupScreen({ navigation }) {
         style={styles.formInput}
         onChangeText={(event) => setPassword(event)}
       />
-      {/* <TextInput
-        placeholder="Enter First Name"
-        labelName="firstName"
-        value={firstName}
-        style={styles.formInput}
-        onChangeText={(event) => setFirstName(event)}
-      />
-      <TextInput
-        placeholder="Enter Last Name"
-        labelName="lastName"
-        value={lastName}
-        style={styles.formInput}
-        onChangeText={(event) => setLastName(event)}
-      /> */}
       <Button
         inline
         inverted
         style={styles.button}
-        onPress={() => register(email, password)}
+        onPress={async () => await register(email, password, name)}
       >
         Sign Up
       </Button>
